@@ -24,29 +24,30 @@ struct LogoView: View {
     }
     
     private func playAnimation() {
-        withAnimation(.custom(duration: 0.2)) {
+        withAnimation(.logoCustom(duration: 0.2)) {
             backgroundPhase = .chevron
             foregroundPhase = .deltoid
         } completion: {
-            withAnimation(.customReverse(duration: 0.2)) {
+            withAnimation(.logoCustomReverse(duration: 0.2)) {
                 foregroundPhase = .chevron
             } completion: {
                 withAnimation(.linear(duration: 0.2)) {
                     backgroundPhase = .movedChevron
                     foregroundPhase = .movedChevron
                 } completion: {
-                    withAnimation(.custom(duration: 0.2)) {
+                    withAnimation(.logoCustom(duration: 0.2)) {
                         backgroundPhase = .sigma
                     } completion: {
-                        withAnimation(.customReverse(duration: 0.6)) {
+                        withAnimation(.logoCustomReverse(duration: 0.6)) {
                             backgroundPhase = .complete
                         }
                         
-                        withAnimation(.custom(duration: 0.2)) {
+                        withAnimation(.logoCustom(duration: 0.2)) {
                             foregroundPhase = .sigma
                         } completion: {
-                            withAnimation(.customReverse(duration: 0.2)) {
+                            withAnimation(.logoCustomReverse(duration: 0.2)) {
                                 foregroundPhase = .complete
+                            } completion: {
                                 onComplete?()
                             }
                         }
@@ -68,6 +69,9 @@ struct LogoView: View {
         .onChange(of: animationTrigger) { oldValue, newValue in
             if oldValue == false && newValue == true {
                 playAnimation()
+            } else {
+                backgroundPhase = .deltoid
+                foregroundPhase = .none
             }
         }
     }

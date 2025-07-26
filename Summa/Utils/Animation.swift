@@ -8,11 +8,15 @@
 import SwiftUI
 
 extension Animation {
-    static func custom(duration: Double = 1) -> Animation {
+    static func logoCustom(duration: Double = 1) -> Animation {
         .timingCurve(1, 0, 0.66, 1, duration: duration)
     }
     
-    static func customReverse(duration: Double = 1) -> Animation {
+    static func logoCustomReverse(duration: Double = 1) -> Animation {
         .timingCurve(0.33, 0, 0, 1, duration: duration)
+    }
+    
+    static func logoSlide(duration: Double = 1) -> Animation {
+        .timingCurve(0.25, 0, 0.2, 0.2, duration: duration)
     }
 }

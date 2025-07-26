@@ -29,9 +29,22 @@
 		BC5B4F222E26B6900015DE93 /* SummaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SummaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BC9174562E326D960091E784 /* Exceptions for "Summa" folder in "Summa" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BC5B4F0A2E26B6900015DE93 /* Summa */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BC5B4F0D2E26B6900015DE93 /* Summa */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BC9174562E326D960091E784 /* Exceptions for "Summa" folder in "Summa" target */,
+			);
 			path = Summa;
 			sourceTree = "<group>";
 		};
@@ -43,6 +56,11 @@
 		BC5B4F252E26B6900015DE93 /* SummaUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = SummaUITests;
+			sourceTree = "<group>";
+		};
+		BC9174522E318B080091E784 /* Fonts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +93,7 @@
 		BC5B4F022E26B6900015DE93 = {
 			isa = PBXGroup;
 			children = (
+				BC9174522E318B080091E784 /* Fonts */,
 				BC5B4F0D2E26B6900015DE93 /* Summa */,
 				BC5B4F1B2E26B6900015DE93 /* SummaTests */,
 				BC5B4F252E26B6900015DE93 /* SummaUITests */,
@@ -109,6 +128,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				BC5B4F0D2E26B6900015DE93 /* Summa */,
+				BC9174522E318B080091E784 /* Fonts */,
 			);
 			name = Summa;
 			packageProductDependencies = (
@@ -397,6 +417,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Summa/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -424,6 +445,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Summa/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
