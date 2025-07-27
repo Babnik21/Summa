@@ -51,7 +51,7 @@ struct TitleTextView: View {
 
 extension TitleTextView {
     func onComplete(_ action: @escaping () -> Void) -> some View {
-        return TitleTextView(animationTrigger: self.$animationTrigger, onComplete: action)
+        return TitleTextView(animationTrigger: self.$animationTrigger, animationDuration: self.animationDuration, onComplete: action)
     }
 }
 

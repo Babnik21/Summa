@@ -19,4 +19,8 @@ extension Animation {
     static func logoSlide(duration: Double = 1) -> Animation {
         .timingCurve(0.25, 0, 0.2, 0.2, duration: duration)
     }
+    
+    static func logoSpin(duration: Double = 1) -> Animation {
+        .timingCurve(0.5, -0.25, 0.5, 1.25, duration: duration)
+    }
 }

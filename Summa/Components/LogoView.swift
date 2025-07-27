@@ -23,6 +23,13 @@ struct LogoView: View {
         self.onComplete = onComplete
     }
     
+    init (isComplete: Bool, strokeWidth: CGFloat = 8) {
+        _animationTrigger = .constant(false)
+        self.backgroundPhase = isComplete ? .complete : .deltoid
+        self.foregroundPhase = isComplete ? .complete : .none
+        self.strokeWidth = strokeWidth
+    }
+    
     private func playAnimation() {
         withAnimation(.logoCustom(duration: 0.2)) {
             backgroundPhase = .chevron
