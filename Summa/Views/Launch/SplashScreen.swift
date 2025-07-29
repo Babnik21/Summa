@@ -20,8 +20,8 @@ struct SplashScreen: View {
         } completion: {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 rotation = .zero
-                if launchCoordinator.loadingState == .awaitingAnimation {
-                    launchCoordinator.loadingState = .finished
+                if launchCoordinator.loadingState == .awaitingSpinnerAnimation {
+                    launchCoordinator.loadingState = .spinnerFinished
                 } else {
                     animate()
                 }
@@ -42,16 +42,16 @@ struct SplashScreen: View {
                     animate()
                 }
             
-            if launchCoordinator.loadingState == .awaitingAnimation {
+            if launchCoordinator.loadingState == .awaitingSpinnerAnimation {
                 Text("Data is Ready")
             }
             
-            if launchCoordinator.loadingState == .finished {
+            if launchCoordinator.loadingState == .spinnerFinished {
                 Text("Animation Finished")
             }
             
             Button {
-                launchCoordinator.loadingState = .awaitingAnimation
+                launchCoordinator.loadingState = .awaitingSpinnerAnimation
             } label: {
                 Capsule()
                     .fill(Color.blue)

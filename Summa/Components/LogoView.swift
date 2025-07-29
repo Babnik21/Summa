@@ -8,23 +8,24 @@
 import SwiftUI
 
 struct LogoView: View {
-    @Binding var animationTrigger: Bool
+//    @Binding var animationTrigger: Bool
+    @ObservedObject var launchCoordinator: LaunchCoordinator
     
     @State private var backgroundPhase: LogoPhase
     @State private var foregroundPhase: LogoPhase
     var strokeWidth: CGFloat = 8
     var onComplete: (() -> Void)?
     
-    init(animationTrigger: Binding<Bool>, strokeWidth: CGFloat = 8, onComplete: (() -> Void)? = nil) {
-        _animationTrigger = animationTrigger
-        self.backgroundPhase = animationTrigger.wrappedValue ? .complete : .deltoid
-        self.foregroundPhase = animationTrigger.wrappedValue ? .complete : .none
+    init(launchCoordinator: LaunchCoordinator, strokeWidth: CGFloat = 8, onComplete: (() -> Void)? = nil) {
+        self.launchCoordinator = launchCoordinator
+        self.backgroundPhase = .deltoid
+        self.foregroundPhase = .none
         self.strokeWidth = strokeWidth
         self.onComplete = onComplete
     }
     
     init (isComplete: Bool, strokeWidth: CGFloat = 8) {
-        _animationTrigger = .constant(false)
+        self.launchCoordinator = LaunchCoordinator()
         self.backgroundPhase = isComplete ? .complete : .deltoid
         self.foregroundPhase = isComplete ? .complete : .none
         self.strokeWidth = strokeWidth
@@ -73,12 +74,9 @@ struct LogoView: View {
                 .inset(by: strokeWidth)
                 .fill(.white)
         }
-        .onChange(of: animationTrigger) { oldValue, newValue in
-            if oldValue == false && newValue == true {
+        .onChange(of: launchCoordinator.loadingState) { _, newValue in
+            if newValue == .logoAnimation {
                 playAnimation()
-            } else {
-                backgroundPhase = .deltoid
-                foregroundPhase = .none
             }
         }
     }
@@ -86,7 +84,7 @@ struct LogoView: View {
 
 extension LogoView {
     func onComplete(onComplete: @escaping () -> Void) -> LogoView {
-        return LogoView(animationTrigger: self.$animationTrigger, strokeWidth: self.strokeWidth, onComplete: onComplete)
+        return LogoView(launchCoordinator: self.launchCoordinator, strokeWidth: self.strokeWidth, onComplete: onComplete)
     }
 }
 

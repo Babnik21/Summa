@@ -15,13 +15,21 @@ struct MainTabView: View {
     var body: some View {
         switch isSignedIn {
         case true:
-            Text("Signed in")
+            switch launchCoordinator.loadingState {
+            case .logoAnimation:
+                LogoIntroView(isSignedIn: true, launchCoordinator: launchCoordinator)
+            case .finished:
+//                HomeView()
+                EmptyView()
+            default:
+                Text("Error")
+            }
         case false:
-            LogoIntroSignedOut()
+            LogoIntroView(isSignedIn: false, launchCoordinator: launchCoordinator)
         default:
             SplashScreen(launchCoordinator: launchCoordinator)
                 .onChange(of: launchCoordinator.loadingState) { _, newValue in
-                    if newValue == .finished {
+                    if newValue == .spinnerFinished {
                         isSignedIn = false
                     }
                 }
