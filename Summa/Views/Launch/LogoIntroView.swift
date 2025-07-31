@@ -16,22 +16,6 @@ struct LogoIntroView: View {
     
     @State private var logoScale: CGFloat = 0.9
     @State private var logoOffset: CGFloat = 0
-
-      //// Old animation
-//    private func animate() {
-//        withAnimation(.easeInOut(duration: 0.5)) {
-//            showText = true
-//            logoOffset = screenWidth / 2 - 50
-//            logoScale = 0.4
-//        } completion: {
-//            withAnimation(.logoSlide(duration: 0.6)) {
-//                logoOffset = 0
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-//                    textAnimationTrigger = true
-//                }
-//            }
-//        }
-//    }
     
     private func removeLogo() {
         withAnimation {

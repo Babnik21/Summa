@@ -72,7 +72,7 @@ struct LogoView: View {
             
             LineShape(phase: foregroundPhase)
                 .inset(by: strokeWidth)
-                .fill(.white)
+                .fill(.greenDefault)
         }
         .onChange(of: launchCoordinator.loadingState) { _, newValue in
             if newValue == .logoAnimation {

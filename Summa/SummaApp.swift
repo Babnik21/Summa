@@ -12,6 +12,7 @@ struct SummaApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .appBackground()
         }
     }
 }
