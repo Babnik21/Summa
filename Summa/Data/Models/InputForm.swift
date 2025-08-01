@@ -76,3 +76,16 @@ class SignUpForm: Validatable, ObservableObject {
             NSPredicate(format: "SELF MATCHES %@", digit).evaluate(with: password)
     }
 }
+
+class ResetPasswordForm: Validatable, ObservableObject {
+    @Published var email: String
+    
+    init(email: String = "") {
+        self.email = email
+    }
+    
+    var isValid: Bool {
+        let regex = #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
+        return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: email)
+    }
+}

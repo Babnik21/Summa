@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MainTabView: View {
+//    @StateObject var tabViewModel: TabViewModel = TabViewModel()
     
     var body: some View {
         Text("Hello, World!")

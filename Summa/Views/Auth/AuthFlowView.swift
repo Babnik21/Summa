@@ -18,6 +18,7 @@ enum AuthScreen {
 struct AuthFlowView: View {
     @State private var currentScreen: AuthScreen = .login
     @ObservedObject var launchCoordinator: LaunchCoordinator
+//    @ObservedObject var authViewModel: AuthViewModel
     
     var body: some View {
         Group {
