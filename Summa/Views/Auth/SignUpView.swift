@@ -9,12 +9,21 @@ import SwiftUI
 
 struct SignUpView: View {
     @StateObject var signUpForm: SignUpForm = SignUpForm()
-    @State private var isError: Bool = false
+    @Binding var errorMessage: String?
     
     var onSignupTap: ((SignUpForm) -> Void)?
     var onToggleTap: (() -> Void)?
     
     var body: some View {
+        let isError = Binding<Bool>(
+            get: { errorMessage != nil },
+            set: { newValue in
+                if !newValue {
+                    errorMessage = nil
+                }
+            }
+        )
+        
         VStack {
             Spacer()
             
@@ -24,21 +33,30 @@ struct SignUpView: View {
             Spacer()
             
             VStack(spacing: 10) {
-                AuthInputFieldView(text: $signUpForm.firstName, title: "First Name", placeholder: "John", isError: $isError)
+                AuthInputFieldView(text: $signUpForm.firstName, title: "First Name", placeholder: "John", isError: isError)
                 
-                AuthInputFieldView(text: $signUpForm.lastName, title: "Last Name", placeholder: "Doe", isError: $isError)
+                AuthInputFieldView(text: $signUpForm.lastName, title: "Last Name", placeholder: "Doe", isError: isError)
                 
-                AuthInputFieldView(text: $signUpForm.email, title: "Email", placeholder: "example@email.com", isError: $isError)
+                AuthInputFieldView(text: $signUpForm.email, title: "Email", placeholder: "example@email.com", isError: isError)
                 
-                AuthInputFieldView(text: $signUpForm.password, title: "Password", placeholder: "Your Password", isSecureField: true, isError: $isError)
+                AuthInputFieldView(text: $signUpForm.password, title: "Password", placeholder: "Your Password", isSecureField: true, isError: isError)
                 
-                AuthInputFieldView(text: $signUpForm.repeatPassword, title: "Repeat Password", placeholder: "Your Password", isSecureField: true, isError: $isError)
+                AuthInputFieldView(text: $signUpForm.repeatPassword, title: "Repeat Password", placeholder: "Your Password", isSecureField: true, isError: isError)
+                
+                HStack {
+                    Text("Invalid email.")
+                        .font(.subheadline)
+                        .foregroundStyle(.defaultRed)
+                    
+                    Spacer()
+                }
                 
                 Spacer()
                 
                 AuthButton(.custom("Sign Up"))
                     .onTap {
                         // TODO: Login
+                        onSignupTap?(signUpForm)
                     }
                 
                 LogInSignUpToggle(toLogin: true) {
@@ -59,15 +77,15 @@ struct SignUpView: View {
 
 extension SignUpView {
     func onSignupTap(_ action: @escaping (SignUpForm) -> Void) -> SignUpView {
-        return SignUpView(signUpForm: self.signUpForm, onSignupTap: action, onToggleTap: self.onToggleTap)
+        return SignUpView(signUpForm: self.signUpForm, errorMessage: self.$errorMessage, onSignupTap: action, onToggleTap: self.onToggleTap)
     }
     
     func onToggleTap(_ action: @escaping () -> Void) -> SignUpView {
-        return SignUpView(signUpForm: self.signUpForm, onSignupTap: self.onSignupTap, onToggleTap: action)
+        return SignUpView(signUpForm: self.signUpForm, errorMessage: self.$errorMessage, onSignupTap: self.onSignupTap, onToggleTap: action)
     }
 }
 
 #Preview {
-    SignUpView()
+    SignUpView(errorMessage: .constant("Test"))
         .appBackground()
 }

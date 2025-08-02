@@ -32,13 +32,16 @@ struct AuthInputFieldView: View {
                 .padding(12)
                 .background(
                     RoundedRectangle(cornerSize: CGSize(width: 16, height: 16))
-                        .strokeBorder(isFocused ? .authButtonStroke : (isError ? .defaultRed : .greenDefault), lineWidth: 1)
+                        .strokeBorder(isError ? .defaultRed : (isFocused ? .authButtonStroke : .greenDefault), lineWidth: 1)
                 )
                 .font(.body)
                 .onChange(of: isFocused) { _, newValue in
                     if newValue {
                         isError = false
                     }
+                }
+                .onChange(of: text) {
+                    isError = false
                 }
         }
     }

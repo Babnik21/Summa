@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-enum ResetPasswordStatus: Equatable {
+enum AuthRequestStatus: Equatable {
     case awaiting
     case emailSent
     case error(Error?)
     
-    static func == (lhs: ResetPasswordStatus, rhs: ResetPasswordStatus) -> Bool {
+    static func == (lhs: AuthRequestStatus, rhs: AuthRequestStatus) -> Bool {
         switch (lhs, rhs) {
         case (.awaiting, .awaiting), (.emailSent, .emailSent):
             return true
@@ -25,15 +25,15 @@ enum ResetPasswordStatus: Equatable {
 }
 
 struct ForgotPasswordView: View {
-    @ObservedObject var launchCoordinator: LaunchCoordinator
-    @ObservedObject var form: ResetPasswordForm = ResetPasswordForm()
-    @State private var resetStatus: ResetPasswordStatus = .awaiting
+    @StateObject var form: ResetPasswordForm = ResetPasswordForm()
+    @Binding var status: AuthRequestStatus
+    @Binding var errorMessage: String?
     
     var onConfirmTap: ((ResetPasswordForm) -> Void)?
     var onReturnTap: (() -> Void)?
     
     func messageText() -> String {
-        switch resetStatus {
+        switch status {
         case .awaiting:
             return "Reset instructions will be sent to your email."
         case .emailSent:
@@ -44,6 +44,15 @@ struct ForgotPasswordView: View {
     }
     
     var body: some View {
+        let isError = Binding<Bool>(
+            get: { errorMessage != nil },
+            set: { newValue in
+                if !newValue {
+                    errorMessage = nil
+                }
+            }
+        )
+        
         VStack {
             Spacer()
             
@@ -53,11 +62,11 @@ struct ForgotPasswordView: View {
             Spacer()
             
             VStack(alignment: .leading, spacing: 10) {
-                AuthInputFieldView(text: $form.email, title: "Enter your email:", placeholder: "example@email.com", isError: .constant(false))
+                AuthInputFieldView(text: $form.email, title: "Enter your email:", placeholder: "example@email.com", isError: isError)
                 
                 Text(messageText())
                     .font(.subheadline)
-                    .tint(resetStatus == .error(nil) ? .defaultRed : .primary)
+                    .tint(status == .error(nil) ? .defaultRed : .primary)
                     .lineLimit(1)
                 
                 Spacer()
@@ -86,15 +95,15 @@ struct ForgotPasswordView: View {
 
 extension ForgotPasswordView {
     func onConfirmTap(_ action: @escaping (ResetPasswordForm) -> Void) -> ForgotPasswordView {
-        return ForgotPasswordView(launchCoordinator: self.launchCoordinator, form: self.form, onConfirmTap: action, onReturnTap: self.onReturnTap)
+        return ForgotPasswordView(form: self.form, status: self.$status, errorMessage: self.$errorMessage, onConfirmTap: action, onReturnTap: self.onReturnTap)
     }
     
     func onReturnTap(_ action: @escaping () -> Void) -> ForgotPasswordView {
-        return ForgotPasswordView(launchCoordinator: self.launchCoordinator, form: self.form, onConfirmTap: self.onConfirmTap, onReturnTap: action)
+        return ForgotPasswordView(form: self.form, status: self.$status, errorMessage: self.$errorMessage, onConfirmTap: self.onConfirmTap, onReturnTap: action)
     }
 }
 
 #Preview {
-    ForgotPasswordView(launchCoordinator: LaunchCoordinator())
+    ForgotPasswordView(status: .constant(.awaiting), errorMessage: .constant("Test"))
         .appBackground()
 }

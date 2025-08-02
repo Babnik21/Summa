@@ -15,7 +15,7 @@ struct LogInSignUpToggle: View {
     }
     
     var LargeText: String {
-        toLogin ? "Log In" : "Sign Up for free!"
+        toLogin ? "Log In!" : "Sign Up for free!"
     }
     
     var action: (() -> Void)?
