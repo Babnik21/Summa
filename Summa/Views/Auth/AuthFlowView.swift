@@ -16,9 +16,7 @@ enum AuthScreen {
 
 struct AuthFlowView: View {
     @State private var currentScreen: AuthScreen = .login
-    @State private var errorMessage: String?
-    @ObservedObject var launchCoordinator: LaunchCoordinator
-//    @ObservedObject var authViewModel: AuthViewModel
+    @ObservedObject var authViewModel: AuthViewModel
     
     func transition(via state1: AuthScreen, to state2: AuthScreen) {
         withAnimation(.easeIn(duration: 0.15)) {
@@ -34,22 +32,42 @@ struct AuthFlowView: View {
         Group {
             switch currentScreen {
             case .login:
-                LogInView(launchCoordinator: launchCoordinator, errorMessage: $errorMessage)
+                LogInView(loadingState: $authViewModel.loadingState, errorMessage: $authViewModel.errorMessage)
+                    .onLoginTap({ form in
+                        Task {
+                            await authViewModel.logIn(form: form)
+                        }
+                    })
+                    .onGoogleTap {
+                        print("User: \(authViewModel.auth.currentSession?.user.email ?? "No Email")")
+                    }
+                    .onAppleTap {
+                        print("current screen: \(currentScreen)")
+                        print("loading state : \(authViewModel.loadingState)")
+                    }
                     .onToggleTap {
+                        authViewModel.errorMessage = nil
                         transition(via: .loading, to: .signup)
                     }
                     .onForgotPasswordTap {
+                        authViewModel.errorMessage = nil
                         transition(via: .loading, to: .forgotPassword)
                     }
                     .transition(.move(edge: .leading))
             case .signup:
-                SignUpView(errorMessage: $errorMessage)
+                SignUpView(errorMessage: $authViewModel.errorMessage)
+                    .onSignupTap({ form in
+                        Task {
+                            await authViewModel.signUp(form: form)
+                        }
+                    })
                     .onToggleTap {
+                        authViewModel.errorMessage = nil
                         transition(via: .loading, to: .login)
                     }
                     .transition(.move(edge: .trailing))
             case .forgotPassword:
-                ForgotPasswordView(status: .constant(.awaiting), errorMessage: $errorMessage)
+                ForgotPasswordView(status: .constant(.awaiting), errorMessage: $authViewModel.errorMessage)
                     .onReturnTap {
                         transition(via: .loading, to: .login)
                     }
@@ -62,6 +80,6 @@ struct AuthFlowView: View {
 }
 
 #Preview {
-    AuthFlowView(launchCoordinator: LaunchCoordinator())
+    AuthFlowView(authViewModel: AuthViewModel())
         .appBackground()
 }

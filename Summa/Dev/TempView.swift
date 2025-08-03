@@ -6,77 +6,51 @@
 //
 
 import SwiftUI
+import Supabase
+
+struct TestTableResults: Decodable {
+    let id: Int
+    let createdAt: Date
+    let test: String
+}
+
 
 struct TempView: View {
-    @State private var isReady: Bool = false
-    @State private var isFinished: Bool = false
-    @State private var rotation: Angle = .zero
-    private let strokeWidth: CGFloat = 5
+    @State var id: Int = 0
     
-    private let logoScale: CGFloat = 0.9
-    
-    func animate() {
-        withAnimation(.logoSpin(duration: 1)) {
-            rotation = .degrees(180)
-        } completion: {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                rotation = .zero
-                if isReady {
-                    isFinished = true
-                } else {
-                    animate()
-                }
-            }
-        }
-
-    }
+    let supabase = SupabaseClient(
+        supabaseURL: Env.apiUrl,
+        supabaseKey: Env.apiKey
+    )
     
     var body: some View {
-        VStack {
-            LogoView(
-                isComplete: false,
-                strokeWidth: strokeWidth
-            )
-                .rotationEffect(rotation)
-                .frame(width: 250 * logoScale, height: 305 * logoScale)
-                .onAppear {
-                    animate()
+        Text("Current id: \(id)")
+        
+        Button {
+            Task {
+                do {
+                    let results: [TestTableResults] = try await supabase
+                        .from("test")
+                        .select()
+                        .execute()
+                        .value
+                    
+                    id = results[0].id
+                } catch {
+                    print("Error querying: \(error)")
                 }
-            
-            if isReady {
-                Text("Data is Ready")
             }
-            
-            if isFinished {
-                Text("Animation Finished")
-            }
-            
-            Button {
-                isReady = true
-            } label: {
-                Capsule()
-                    .fill(Color.blue)
-                    .frame(width: 100, height: 50)
-                    .overlay {
-                        Text("Ready")
-                            .foregroundStyle(.white)
-                    }
-            }
-            
-            Button {
-                isReady = false
-                isFinished = false
-                animate()
-            } label: {
-                Capsule()
-                    .fill(Color.blue)
-                    .frame(width: 100, height: 50)
-                    .overlay {
-                        Text("Reset")
-                            .foregroundStyle(.white)
-                    }
-            }
+        } label: {
+            Capsule()
+                .fill(Color.blue)
+                .frame(width: 100, height: 50)
+                .overlay(
+                    Text("Query")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                )
         }
+
     }
 }
 

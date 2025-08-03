@@ -7,33 +7,51 @@
 
 import SwiftUI
 
+// TODO: Rework intro view so that the logged-in animation is built into splash screen
+// TODO: That way LogoIntroView can be removed
+
 struct ContentView: View {
-    @StateObject var launchCoordinator = LaunchCoordinator()
-//    @StateObject var authviewModel = AuthViewModel()
-    @State private var isSignedIn: Bool? = nil
+//    @StateObject var launchCoordinator = LaunchCoordinator()
+    @StateObject var authViewModel = AuthViewModel()
+//    @State private var showHomeScreen: Bool? = nil
     
     var body: some View {
-        switch isSignedIn {
-        case true:
-            switch launchCoordinator.loadingState {
-            case .logoAnimation:
-                LogoIntroView(isSignedIn: true, launchCoordinator: launchCoordinator)
-            case .finished:
-//                HomeView()
-                EmptyView()
-            default:
-                Text("Error")
-            }
-        case false:
-            AuthFlowView(launchCoordinator: launchCoordinator)
-        default:
-            SplashScreen(launchCoordinator: launchCoordinator)
-                .onChange(of: launchCoordinator.loadingState) { _, newValue in
-                    if newValue == .spinnerFinished {
-                        isSignedIn = false
+        Group {
+            if authViewModel.loadingState <= .awaitingSpinnerAnimation {
+                SplashScreen(loadingState: $authViewModel.loadingState)
+            } else if authViewModel.isAuthenticated ?? true && authViewModel.loadingState > .awaitingSpinnerAnimation {
+                if authViewModel.loadingState < .finished {
+                    LogoIntroView(isSignedIn: true, loadingState: $authViewModel.loadingState)
+                } else {
+                    //                HomeView()
+                    Text("Hello, \(SupabaseManager.shared.client.auth.currentSession?.user.email ?? "No User")")
+                        .transition(.move(edge: .bottom))
+ 
+                    Button {
+                        Task {
+                            await authViewModel.logOut()
+                        }
+                    } label: {
+                        Text("Sign Out")
+                            .tint(.primary)
                     }
+                    .transition(.move(edge: .bottom))
                 }
+            } else {
+                AuthFlowView(authViewModel: authViewModel)
+                    .transition(.move(edge: .bottom))
+            }
         }
+            .onAppear {
+                Task {
+                    await authViewModel.checkAuth()
+                }
+            }
+//            .onChange(of: authViewModel.loadingState) { _, newValue in
+//                if newValue == .spinnerFinished {
+//                    showHomeScreen = authViewModel.isAuthenticated
+//                }
+//            }
     }
 }
 

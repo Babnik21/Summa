@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TitleTextView: View {
-    @ObservedObject var launchCoordinator: LaunchCoordinator
+    @Binding var loadingState: LoadingState
     var fontSize: CGFloat = 48
     var animationDuration: Double = 1
     
@@ -23,8 +23,8 @@ struct TitleTextView: View {
             .mask {
                 SmallCapsText("Summa", fontSize: fontSize)
             }
-            .onChange(of: launchCoordinator.loadingState) { _, newValue in
-                if launchCoordinator.loadingState == .textAnimation {
+            .onChange(of: loadingState) { _, newValue in
+                if loadingState == .textAnimation {
                     withAnimation(.linear(duration: 0.1 * animationDuration)) {
                         transitionEnd = 0.1
                     } completion: {
@@ -46,10 +46,10 @@ struct TitleTextView: View {
 
 extension TitleTextView {
     func onComplete(_ action: @escaping () -> Void) -> some View {
-        return TitleTextView(launchCoordinator: self.launchCoordinator, animationDuration: self.animationDuration, onComplete: action)
+        return TitleTextView(loadingState: self.$loadingState, animationDuration: self.animationDuration, onComplete: action)
     }
 }
 
 #Preview {
-    TitleTextView(launchCoordinator: LaunchCoordinator())
+    TitleTextView(loadingState: .constant(.finished))
 }

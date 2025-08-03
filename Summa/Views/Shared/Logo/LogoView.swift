@@ -9,15 +9,15 @@ import SwiftUI
 
 struct LogoView: View {
 //    @Binding var animationTrigger: Bool
-    @ObservedObject var launchCoordinator: LaunchCoordinator
+    @Binding var loadingState: LoadingState
     
     @State private var backgroundPhase: LogoPhase
     @State private var foregroundPhase: LogoPhase
     var strokeWidth: CGFloat = 8
     var onComplete: (() -> Void)?
     
-    init(launchCoordinator: LaunchCoordinator, strokeWidth: CGFloat = 8, onComplete: (() -> Void)? = nil) {
-        self.launchCoordinator = launchCoordinator
+    init(loadingState: Binding<LoadingState>, strokeWidth: CGFloat = 8, onComplete: (() -> Void)? = nil) {
+        self._loadingState = loadingState
         self.backgroundPhase = .deltoid
         self.foregroundPhase = .none
         self.strokeWidth = strokeWidth
@@ -25,7 +25,7 @@ struct LogoView: View {
     }
     
     init (isComplete: Bool, strokeWidth: CGFloat = 8) {
-        self.launchCoordinator = LaunchCoordinator()
+        self._loadingState = .constant(.finished)
         self.backgroundPhase = isComplete ? .complete : .deltoid
         self.foregroundPhase = isComplete ? .complete : .none
         self.strokeWidth = strokeWidth
@@ -74,7 +74,7 @@ struct LogoView: View {
                 .inset(by: strokeWidth)
                 .fill(.greenDefault)
         }
-        .onChange(of: launchCoordinator.loadingState) { _, newValue in
+        .onChange(of: loadingState) { _, newValue in
             if newValue == .logoAnimation {
                 playAnimation()
             }
@@ -84,7 +84,7 @@ struct LogoView: View {
 
 extension LogoView {
     func onComplete(onComplete: @escaping () -> Void) -> LogoView {
-        return LogoView(launchCoordinator: self.launchCoordinator, strokeWidth: self.strokeWidth, onComplete: onComplete)
+        return LogoView(loadingState: self.$loadingState, strokeWidth: self.strokeWidth, onComplete: onComplete)
     }
 }
 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SplashScreen: View {
-    @ObservedObject var launchCoordinator: LaunchCoordinator
+    @Binding var loadingState: LoadingState
     @State private var rotation: Angle = .zero
     
     private let strokeWidth: CGFloat = 5
@@ -20,8 +20,8 @@ struct SplashScreen: View {
         } completion: {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 rotation = .zero
-                if launchCoordinator.loadingState == .awaitingSpinnerAnimation {
-                    launchCoordinator.loadingState = .spinnerFinished
+                if loadingState == .awaitingSpinnerAnimation {
+                    loadingState = .spinnerFinished
                 } else {
                     animate()
                 }
@@ -31,7 +31,7 @@ struct SplashScreen: View {
     }
     
     var body: some View {
-        VStack {
+//        VStack {
             LogoView(
                 isComplete: false,
                 strokeWidth: strokeWidth
@@ -42,42 +42,42 @@ struct SplashScreen: View {
                     animate()
                 }
             
-            if launchCoordinator.loadingState == .awaitingSpinnerAnimation {
-                Text("Data is Ready")
-            }
-            
-            if launchCoordinator.loadingState == .spinnerFinished {
-                Text("Animation Finished")
-            }
-            
-            Button {
-                launchCoordinator.loadingState = .awaitingSpinnerAnimation
-            } label: {
-                Capsule()
-                    .fill(Color.blue)
-                    .frame(width: 100, height: 50)
-                    .overlay {
-                        Text("Ready")
-                            .foregroundStyle(.white)
-                    }
-            }
-            
-            Button {
-                launchCoordinator.loadingState = .loading
-                animate()
-            } label: {
-                Capsule()
-                    .fill(Color.blue)
-                    .frame(width: 100, height: 50)
-                    .overlay {
-                        Text("Reset")
-                            .foregroundStyle(.white)
-                    }
-            }
-        }
+//            if launchCoordinator.loadingState == .awaitingSpinnerAnimation {
+//                Text("Data is Ready")
+//            }
+//            
+//            if launchCoordinator.loadingState == .spinnerFinished {
+//                Text("Animation Finished")
+//            }
+//            
+//            Button {
+//                launchCoordinator.loadingState = .awaitingSpinnerAnimation
+//            } label: {
+//                Capsule()
+//                    .fill(Color.blue)
+//                    .frame(width: 100, height: 50)
+//                    .overlay {
+//                        Text("Ready")
+//                            .foregroundStyle(.white)
+//                    }
+//            }
+//            
+//            Button {
+//                launchCoordinator.loadingState = .loading
+//                animate()
+//            } label: {
+//                Capsule()
+//                    .fill(Color.blue)
+//                    .frame(width: 100, height: 50)
+//                    .overlay {
+//                        Text("Reset")
+//                            .foregroundStyle(.white)
+//                    }
+//            }
+//        }
     }
 }
 
 #Preview {
-    SplashScreen(launchCoordinator: LaunchCoordinator())
+    SplashScreen(loadingState: .constant(.finished))
 }

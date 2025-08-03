@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// TODO: Make it so that when typing stuff in it doesn't push the text into safe area
+
 struct SignUpView: View {
     @StateObject var signUpForm: SignUpForm = SignUpForm()
     @Binding var errorMessage: String?
@@ -44,7 +46,7 @@ struct SignUpView: View {
                 AuthInputFieldView(text: $signUpForm.repeatPassword, title: "Repeat Password", placeholder: "Your Password", isSecureField: true, isError: isError)
                 
                 HStack {
-                    Text("Invalid email.")
+                    Text(errorMessage ?? "")
                         .font(.subheadline)
                         .foregroundStyle(.defaultRed)
                     
@@ -55,14 +57,11 @@ struct SignUpView: View {
                 
                 AuthButton(.custom("Sign Up"))
                     .onTap {
-                        // TODO: Login
                         onSignupTap?(signUpForm)
                     }
                 
                 LogInSignUpToggle(toLogin: true) {
-                    // TODO: Return to Log In
                     onToggleTap?()
-                    return
                 }
                 .padding(.bottom, 60)
             }

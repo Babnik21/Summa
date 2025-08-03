@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LogInView: View {
-    @ObservedObject var launchCoordinator: LaunchCoordinator
+    @Binding var loadingState: LoadingState
     @StateObject var logInForm: LogInForm = LogInForm()
     @Binding var errorMessage: String?
     
@@ -20,12 +20,12 @@ struct LogInView: View {
     
     var body: some View {
         VStack {
-            if launchCoordinator.loadingState < .finished {
-                LogoIntroView(isSignedIn: false, launchCoordinator: launchCoordinator)
-                    .offset(y: launchCoordinator.loadingState >= .logoRemoval ? -UIScreen.main.bounds.height / 2 - 200 : 0)
+            if loadingState < .finished {
+                LogoIntroView(isSignedIn: false, loadingState: $loadingState)
+                    .offset(y: loadingState >= .logoRemoval ? -UIScreen.main.bounds.height / 2 - 200 : 0)
             }
             
-            if launchCoordinator.loadingState >= .logoRemoval {
+            if loadingState >= .logoRemoval {
                 let isError = Binding<Bool>(
                     get: { errorMessage != nil },
                     set: { newValue in
@@ -76,7 +76,7 @@ struct LogInView: View {
                         AuthButton(.google)
                             .onTap {
                                 onGoogleTap?()
-                                errorMessage = "Example Error"
+//                                errorMessage = "Example Error"
                                 // TODO: Login with Google
                             }
                         
@@ -97,7 +97,7 @@ struct LogInView: View {
                         .background(.white)
                         .clipShape(RoundedRectangle(cornerSize: CGSize(width: 25, height: 25)))
                 }
-                    .offset(y: launchCoordinator.loadingState < .finished ? UIScreen.main.bounds.height : 0)
+                    .offset(y: loadingState < .finished ? UIScreen.main.bounds.height : 0)
             }
         }
     }
@@ -105,27 +105,27 @@ struct LogInView: View {
 
 extension LogInView {
     func onLoginTap(_ action: @escaping (LogInForm) -> Void) -> LogInView {
-        return LogInView(launchCoordinator: self.launchCoordinator, logInForm: self.logInForm, errorMessage: self.$errorMessage, onLoginTap: action, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
+        return LogInView(loadingState: self.$loadingState, logInForm: self.logInForm, errorMessage: self.$errorMessage, onLoginTap: action, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
     }
     
     func onGoogleTap(_ action: @escaping () -> Void) -> LogInView {
-        return LogInView(launchCoordinator: self.launchCoordinator, logInForm: self.logInForm, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: action, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
+        return LogInView(loadingState: self.$loadingState, logInForm: self.logInForm, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: action, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
     }
     
     func onAppleTap(_ action: @escaping () -> Void) -> LogInView {
-        return LogInView(launchCoordinator: self.launchCoordinator, logInForm: self.logInForm, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: action, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
+        return LogInView(loadingState: self.$loadingState, logInForm: self.logInForm, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: action, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
     }
     
     func onForgotPasswordTap(_ action: @escaping () -> Void) -> LogInView {
-        return LogInView(launchCoordinator: self.launchCoordinator, logInForm: self.logInForm, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: action, onToggleTap: self.onToggleTap)
+        return LogInView(loadingState: self.$loadingState, logInForm: self.logInForm, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: action, onToggleTap: self.onToggleTap)
     }
     
     func onToggleTap(_ action: @escaping () -> Void) -> LogInView {
-        return LogInView(launchCoordinator: self.launchCoordinator, logInForm: self.logInForm, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: action)
+        return LogInView(loadingState: self.$loadingState, logInForm: self.logInForm, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: action)
     }
 }
 
 #Preview {
-    LogInView(launchCoordinator: LaunchCoordinator(), errorMessage: .constant("Test"))
+    LogInView(loadingState: .constant(.finished), errorMessage: .constant("Test"))
         .appBackground()
 }

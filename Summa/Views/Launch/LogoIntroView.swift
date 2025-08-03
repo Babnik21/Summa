@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LogoIntroView: View {
     let isSignedIn: Bool
-    @ObservedObject var launchCoordinator: LaunchCoordinator
+    @Binding var loadingState: LoadingState
     
     private let strokeWidth: CGFloat = 5
     private let screenWidth: CGFloat = UIScreen.main.bounds.width
@@ -19,10 +19,10 @@ struct LogoIntroView: View {
     
     private func removeLogo() {
         withAnimation {
-            launchCoordinator.loadingState = .logoRemoval
+            loadingState = .logoRemoval
         } completion: {
             withAnimation {
-                launchCoordinator.loadingState = .finished
+                loadingState = .finished
             }
         }
     }
@@ -36,14 +36,14 @@ struct LogoIntroView: View {
                 removeLogo()
             } else {
                 logoOffset = screenWidth / 2 - 50
-                launchCoordinator.loadingState = .preparingTextAnimation
+                loadingState = .preparingTextAnimation
                 withAnimation(.easeOut(duration: 0.5)) {
                     logoScale = 0.4
                 } completion: {
                     withAnimation(.logoSlide(duration: 0.6)) {
                         logoOffset = 0
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            launchCoordinator.loadingState = .textAnimation
+                            loadingState = .textAnimation
                         }
                     }
                 }
@@ -54,17 +54,17 @@ struct LogoIntroView: View {
     var body: some View {
             HStack(spacing: 0) {
                 LogoView(
-                    launchCoordinator: launchCoordinator,
+                    loadingState: $loadingState,
                     strokeWidth: strokeWidth
                 )
                     .onComplete {
                         animate()
                     }
                     .frame(width: 250 * logoScale, height: 305 * logoScale)
-                    .offset(x: launchCoordinator.loadingState >= .preparingTextAnimation ? 16 : 0)
+                    .offset(x: loadingState >= .preparingTextAnimation ? 16 : 0)
                 
-                if launchCoordinator.loadingState >= .preparingTextAnimation {
-                    TitleTextView(launchCoordinator: launchCoordinator, animationDuration: 0.5)
+                if loadingState >= .preparingTextAnimation {
+                    TitleTextView(loadingState: $loadingState, animationDuration: 0.5)
                         .onComplete {
                             removeLogo()
                         }
@@ -73,11 +73,11 @@ struct LogoIntroView: View {
             }
                 .offset(x: logoOffset)
                 .onAppear {
-                    launchCoordinator.loadingState = .logoAnimation
+                    loadingState = .logoAnimation
                 }
     }
 }
 
 #Preview {
-    LogoIntroView(isSignedIn: false, launchCoordinator: LaunchCoordinator())
+    LogoIntroView(isSignedIn: false, loadingState: .constant(.finished))
 }
