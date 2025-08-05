@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-// TODO: Rework intro view so that the logged-in animation is built into splash screen
-// TODO: That way LogoIntroView can be removed
-
 struct ContentView: View {
 //    @StateObject var launchCoordinator = LaunchCoordinator()
     @StateObject var authViewModel = AuthViewModel()
@@ -19,7 +16,7 @@ struct ContentView: View {
         Group {
             if authViewModel.loadingState <= .awaitingSpinnerAnimation {
                 SplashScreen(loadingState: $authViewModel.loadingState)
-            } else if authViewModel.isAuthenticated ?? true && authViewModel.loadingState > .awaitingSpinnerAnimation {
+            } else if authViewModel.loginStatus == .loggedIn && authViewModel.loadingState > .awaitingSpinnerAnimation {
                 if authViewModel.loadingState < .finished {
                     LogoIntroView(isSignedIn: true, loadingState: $authViewModel.loadingState)
                 } else {
@@ -42,16 +39,11 @@ struct ContentView: View {
                     .transition(.move(edge: .bottom))
             }
         }
-            .onAppear {
+            .onOpenURL { url in
                 Task {
-                    await authViewModel.checkAuth()
+                    await authViewModel.confirmEmailFromMagicLink(url: url)
                 }
             }
-//            .onChange(of: authViewModel.loadingState) { _, newValue in
-//                if newValue == .spinnerFinished {
-//                    showHomeScreen = authViewModel.isAuthenticated
-//                }
-//            }
     }
 }
 

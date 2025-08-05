@@ -2,6 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>summa</string>
+			</array>
+		</dict>
+	</array>
 	<key>API_KEY</key>
 	<string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRrdGtnb2dwcGNhbWZzZnNyYnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQxNjQwMTgsImV4cCI6MjA2OTc0MDAxOH0.1RXA8f5ZFoX82cdkVxym7doGQ8AnZLrdFmvGvR1ej9o</string>
 	<key>API_URL</key>

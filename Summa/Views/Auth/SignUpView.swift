@@ -10,7 +10,7 @@ import SwiftUI
 // TODO: Make it so that when typing stuff in it doesn't push the text into safe area
 
 struct SignUpView: View {
-    @StateObject var signUpForm: SignUpForm = SignUpForm()
+    @StateObject private var signUpForm: SignUpForm = SignUpForm()
     @Binding var errorMessage: String?
     
     var onSignupTap: ((SignUpForm) -> Void)?
@@ -76,11 +76,11 @@ struct SignUpView: View {
 
 extension SignUpView {
     func onSignupTap(_ action: @escaping (SignUpForm) -> Void) -> SignUpView {
-        return SignUpView(signUpForm: self.signUpForm, errorMessage: self.$errorMessage, onSignupTap: action, onToggleTap: self.onToggleTap)
+        return SignUpView(errorMessage: self.$errorMessage, onSignupTap: action, onToggleTap: self.onToggleTap)
     }
     
     func onToggleTap(_ action: @escaping () -> Void) -> SignUpView {
-        return SignUpView(signUpForm: self.signUpForm, errorMessage: self.$errorMessage, onSignupTap: self.onSignupTap, onToggleTap: action)
+        return SignUpView(errorMessage: self.$errorMessage, onSignupTap: self.onSignupTap, onToggleTap: action)
     }
 }
 
