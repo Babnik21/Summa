@@ -23,4 +23,8 @@ extension Animation {
     static func logoSpin(duration: Double = 1) -> Animation {
         .timingCurve(0.5, -0.25, 0.5, 1.25, duration: duration)
     }
+    
+    static func moveCustom(duration: Double = 1) -> Animation {
+        .timingCurve(0.33, -1, 1, 1, duration: duration)
+    }
 }

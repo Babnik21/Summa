@@ -9,14 +9,14 @@ import SwiftUI
 
 struct LogoView: View {
 //    @Binding var animationTrigger: Bool
-    @Binding var loadingState: LoadingState
+    @Binding var loadingState: LogoAnimationState
     
     @State private var backgroundPhase: LogoPhase
     @State private var foregroundPhase: LogoPhase
     var strokeWidth: CGFloat = 8
     var onComplete: (() -> Void)?
     
-    init(loadingState: Binding<LoadingState>, strokeWidth: CGFloat = 8, onComplete: (() -> Void)? = nil) {
+    init(loadingState: Binding<LogoAnimationState>, strokeWidth: CGFloat = 8, onComplete: (() -> Void)? = nil) {
         self._loadingState = loadingState
         self.backgroundPhase = .deltoid
         self.foregroundPhase = .none

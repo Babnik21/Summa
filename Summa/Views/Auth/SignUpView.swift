@@ -27,10 +27,9 @@ struct SignUpView: View {
         )
         
         VStack {
-            Spacer()
-            
             Text("Sign up")
                 .font(.title)
+                .padding(.top, 100)
             
             Spacer()
             
@@ -66,7 +65,7 @@ struct SignUpView: View {
                 .padding(.bottom, 60)
             }
                 .padding(20)
-                .frame(maxHeight: UIScreen.main.bounds.height / 1.3)
+                .frame(maxHeight: UIScreen.main.bounds.height * 0.75)
                 .background(.white)
                 .clipShape(RoundedRectangle(cornerSize: CGSize(width: 25, height: 25)))
             

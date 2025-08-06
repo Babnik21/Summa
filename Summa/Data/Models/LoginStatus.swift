@@ -9,7 +9,6 @@ import Foundation
 
 enum LoginStatus {
     case loggedIn
-    case pendingConfirmation
     case loggedOut
-    case loading
+    case none
 }

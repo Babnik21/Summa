@@ -7,32 +7,17 @@
 
 import SwiftUI
 
-enum AuthScreen {
-    case login
-    case signup
-    case forgotPassword
-    case loading
-}
+// TODO: Disable buttons when loading
 
 struct AuthFlowView: View {
-    @State private var currentScreen: AuthScreen = .login
+//    @State private var currentScreen: AuthScreen = .login
     @ObservedObject var authViewModel: AuthViewModel
-    
-    func transition(via state1: AuthScreen, to state2: AuthScreen) {
-        withAnimation(.easeIn(duration: 0.15)) {
-            currentScreen = state1
-        } completion: {
-            withAnimation(.easeOut(duration: 0.15)) {
-                currentScreen = state2
-            }
-        }
-    }
     
     var body: some View {
         Group {
-            switch currentScreen {
+            switch authViewModel.authScreen {
             case .login:
-                LogInView(loadingState: $authViewModel.loadingState, errorMessage: $authViewModel.errorMessage)
+                LogInView(errorMessage: $authViewModel.errorMessage)
                     .onLoginTap({ form in
                         Task {
                             await authViewModel.logIn(form: form)
@@ -42,18 +27,17 @@ struct AuthFlowView: View {
                         print("User: \(authViewModel.auth.currentSession?.user.email ?? "No Email")")
                     }
                     .onAppleTap {
-                        print("current screen: \(currentScreen)")
+                        print("current screen: \(authViewModel.authScreen)")
                         print("loading state : \(authViewModel.loadingState)")
                     }
                     .onToggleTap {
                         authViewModel.errorMessage = nil
-                        transition(via: .loading, to: .signup)
+                        authViewModel.transition(via: .loading, to: .signup)
                     }
                     .onForgotPasswordTap {
                         authViewModel.errorMessage = nil
-                        transition(via: .loading, to: .forgotPassword)
+                        authViewModel.transition(via: .loading, to: .forgotPassword)
                     }
-                    .transition(.move(edge: .leading))
             case .signup:
                 SignUpView(errorMessage: $authViewModel.errorMessage)
                     .onSignupTap({ form in
@@ -63,19 +47,29 @@ struct AuthFlowView: View {
                     })
                     .onToggleTap {
                         authViewModel.errorMessage = nil
-                        transition(via: .loading, to: .login)
+                        authViewModel.transition(via: .loading, to: .login)
                     }
-                    .transition(.move(edge: .trailing))
+            case .confirmEmail (let email):
+                ConfirmEmailView(email: email, errorMessage: $authViewModel.errorMessage)
+                    .onResendTap {
+                        //TODO: Resend Email
+                    }
+                    .onSignOutTap {
+                        Task {
+                            await authViewModel.logOut()
+                        }
+                    }
             case .forgotPassword:
                 ForgotPasswordView(status: .constant(.awaiting), errorMessage: $authViewModel.errorMessage)
                     .onReturnTap {
-                        transition(via: .loading, to: .login)
+                        authViewModel.transition(via: .loading, to: .login)
                     }
-                    .transition(.move(edge: .trailing))
             case .loading:
                 EmptyView()
             }
         }
+            .transition(.move(edge: .bottom))
+            .animation(.easeInOut(duration: 0.15), value: authViewModel.authScreen)
     }
 }
 

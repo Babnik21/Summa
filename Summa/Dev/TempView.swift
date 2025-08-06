@@ -16,41 +16,34 @@ struct TestTableResults: Decodable {
 
 
 struct TempView: View {
-    @State var id: Int = 0
-    
-    let supabase = SupabaseClient(
-        supabaseURL: Env.apiUrl,
-        supabaseKey: Env.apiKey
-    )
-    
+    @State private var showA = true
+
     var body: some View {
-        Text("Current id: \(id)")
-        
-        Button {
-            Task {
-                do {
-                    let results: [TestTableResults] = try await supabase
-                        .from("test")
-                        .select()
-                        .execute()
-                        .value
-                    
-                    id = results[0].id
-                } catch {
-                    print("Error querying: \(error)")
+        VStack {
+            ZStack {
+                if showA {
+                    Rectangle()
+                        .fill(Color.blue)
+                        .frame(width: 200, height: 200)
+                        .transition(.move(edge: .leading))
+                        .transaction { t in
+                            t.animation = .easeIn(duration: 0.5)
+                        }
+                } else {
+                    Rectangle()
+                        .fill(Color.green)
+                        .frame(width: 200, height: 200)
+                        .transition(.move(edge: .leading))
+                        .transaction { t in
+                            t.animation = .easeOut(duration: 0.5)
+                        }
                 }
             }
-        } label: {
-            Capsule()
-                .fill(Color.blue)
-                .frame(width: 100, height: 50)
-                .overlay(
-                    Text("Query")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                )
-        }
 
+            Button("Toggle") {
+                showA.toggle()
+            }
+        }
     }
 }
 

@@ -7,23 +7,6 @@
 
 import SwiftUI
 
-enum AuthRequestStatus: Equatable {
-    case awaiting
-    case emailSent
-    case error(Error?)
-    
-    static func == (lhs: AuthRequestStatus, rhs: AuthRequestStatus) -> Bool {
-        switch (lhs, rhs) {
-        case (.awaiting, .awaiting), (.emailSent, .emailSent):
-            return true
-        case (.error(_), .error(_)):
-            return true
-        default:
-            return false
-        }
-    }
-}
-
 struct ForgotPasswordView: View {
     @StateObject var form: ResetPasswordForm = ResetPasswordForm()
     @Binding var status: AuthRequestStatus
@@ -54,10 +37,9 @@ struct ForgotPasswordView: View {
         )
         
         VStack {
-            Spacer()
-            
             Text("Reset Password")
                 .font(.title)
+                .padding(.top, 100)
             
             Spacer()
             
@@ -66,7 +48,7 @@ struct ForgotPasswordView: View {
                 
                 Text(messageText())
                     .font(.subheadline)
-                    .tint(status == .error(nil) ? .defaultRed : .primary)
+                    .foregroundStyle(status == .error(nil) ? .defaultRed : .primary)
                     .lineLimit(1)
                 
                 Spacer()

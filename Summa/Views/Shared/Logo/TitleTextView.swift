@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TitleTextView: View {
-    @Binding var loadingState: LoadingState
+    @Binding var loadingState: LogoAnimationState
     var fontSize: CGFloat = 48
     var animationDuration: Double = 1
     
