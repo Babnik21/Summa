@@ -14,6 +14,8 @@ enum AuthButtonType {
 }
 
 struct AuthButton: View {
+    @Binding var isDisabled: Bool
+    
     let type: AuthButtonType
     let image: String?
     let systemImage: (name: String, color: Color, size: (width: CGFloat, height: CGFloat))?
@@ -24,9 +26,10 @@ struct AuthButton: View {
     
 //    #1F1F1F
     
-    init (_ type: AuthButtonType, onTap: (() -> Void)? = nil) {
+    init (_ type: AuthButtonType, onTap: (() -> Void)? = nil, isDisabled: Binding<Bool> = .constant(false)) {
         self.type = type
         self.onTap = onTap
+        self._isDisabled = isDisabled
         switch type {
         case .apple:
             self.image = nil
@@ -79,14 +82,20 @@ struct AuthButton: View {
                     }
                     .padding(.horizontal, 16)
                 }
+                .opacity(isDisabled ? 0.5 : 1)
                 .frame(maxWidth: .infinity, maxHeight: 60, alignment: .center)
         }
+            .disabled(isDisabled)
     }
 }
 
 extension AuthButton {
     func onTap(_ action: @escaping () -> Void) -> AuthButton {
-        return AuthButton(self.type, onTap: action)
+        return AuthButton(self.type, onTap: action, isDisabled: self.$isDisabled)
+    }
+    
+    func disabled(_ isDisabled: Binding<Bool>) -> AuthButton {
+        return AuthButton(self.type, onTap: self.onTap, isDisabled: isDisabled)
     }
 }
 

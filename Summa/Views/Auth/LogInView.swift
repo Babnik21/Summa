@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LogInView: View {
     @StateObject private var logInForm: LogInForm = LogInForm()
+    @Binding var isLoading: Bool
     @Binding var errorMessage: String?
     
     var onLoginTap: ((LogInForm) -> Void)?
@@ -18,15 +19,20 @@ struct LogInView: View {
     var onToggleTap: (() -> Void)?
     
     var body: some View {
-        VStack {
-            let isError = Binding<Bool>(
-                get: { errorMessage != nil },
-                set: { newValue in
-                    if !newValue {
-                        errorMessage = nil
-                    }
+        let isDisabled = Binding<Bool>(
+            get: { !logInForm.isValid || isLoading },
+            set: { _ in }
+        )
+        let isError = Binding<Bool>(
+            get: { errorMessage != nil },
+            set: { newValue in
+                if !newValue {
+                    errorMessage = nil
                 }
-            )
+            }
+        )
+        
+        VStack {
             Text("Log in")
                 .font(.title)
                 .padding(.top, 100)
@@ -62,19 +68,21 @@ struct LogInView: View {
                         onLoginTap?(logInForm)
                         // TODO: Login
                     }
+                    .disabled(isDisabled)
                 
                 AuthButton(.google)
                     .onTap {
                         onGoogleTap?()
-                        //                                errorMessage = "Example Error"
                         // TODO: Login with Google
                     }
+                    .disabled($isLoading)
                 
                 AuthButton(.apple)
                     .onTap {
                         onAppleTap?()
                         // TODO: Login with Apple
                     }
+                    .disabled($isLoading)
                 
                 LogInSignUpToggle(toLogin: false) {
                     onToggleTap?()
@@ -93,27 +101,27 @@ struct LogInView: View {
 
 extension LogInView {
     func onLoginTap(_ action: @escaping (LogInForm) -> Void) -> LogInView {
-        return LogInView(errorMessage: self.$errorMessage, onLoginTap: action, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
+        return LogInView(isLoading: self.$isLoading, errorMessage: self.$errorMessage, onLoginTap: action, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
     }
     
     func onGoogleTap(_ action: @escaping () -> Void) -> LogInView {
-        return LogInView(errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: action, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
+        return LogInView(isLoading: self.$isLoading, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: action, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
     }
     
     func onAppleTap(_ action: @escaping () -> Void) -> LogInView {
-        return LogInView(errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: action, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
+        return LogInView(isLoading: self.$isLoading, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: action, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: self.onToggleTap)
     }
     
     func onForgotPasswordTap(_ action: @escaping () -> Void) -> LogInView {
-        return LogInView(errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: action, onToggleTap: self.onToggleTap)
+        return LogInView(isLoading: self.$isLoading, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: action, onToggleTap: self.onToggleTap)
     }
     
     func onToggleTap(_ action: @escaping () -> Void) -> LogInView {
-        return LogInView(errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: action)
+        return LogInView(isLoading: self.$isLoading, errorMessage: self.$errorMessage, onLoginTap: self.onLoginTap, onGoogleTap: self.onGoogleTap, onAppleTap: self.onAppleTap, onForgotPasswordTap: self.onForgotPasswordTap, onToggleTap: action)
     }
 }
 
 #Preview {
-    LogInView(errorMessage: .constant("Test"))
+    LogInView(isLoading: .constant(true), errorMessage: .constant("Test"))
         .appBackground()
 }

@@ -47,31 +47,6 @@ struct ContentView: View {
                         appState = authViewModel.loginStatus == .loggedIn ? .mainTab : .auth
                     }
             }
-            
-//            if authViewModel.loadingState <= .awaitingSpinnerAnimation {
-//                SplashScreen(loadingState: $authViewModel.loadingState)
-//            } else if authViewModel.loginStatus == .loggedIn && authViewModel.loadingState > .awaitingSpinnerAnimation {
-//                if authViewModel.loadingState < .finished {
-//                    LogoIntroView(isSignedIn: true, loadingState: $authViewModel.loadingState)
-//                } else {
-//                    //                HomeView()
-//                    Text("Hello, \(SupabaseManager.shared.client.auth.currentSession?.user.email ?? "No User")")
-////                        .transition(.move(edge: .bottom))
-// 
-//                    Button {
-//                        Task {
-//                            await authViewModel.logOut()
-//                        }
-//                    } label: {
-//                        Text("Sign Out")
-//                            .tint(.primary)
-//                    }
-////                    .transition(.move(edge: .bottom))
-//                }
-//            } else {
-//                AuthFlowView(authViewModel: authViewModel)
-////                    .transition(.move(edge: .bottom))
-//            }
         }
             .animation(.easeInOut(duration: 0.3), value: appState)
             .onOpenURL { url in

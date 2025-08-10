@@ -17,7 +17,7 @@ struct AuthFlowView: View {
         Group {
             switch authViewModel.authScreen {
             case .login:
-                LogInView(errorMessage: $authViewModel.errorMessage)
+                LogInView(isLoading: $authViewModel.isLoading, errorMessage: $authViewModel.errorMessage)
                     .onLoginTap({ form in
                         Task {
                             await authViewModel.logIn(form: form)
@@ -32,14 +32,14 @@ struct AuthFlowView: View {
                     }
                     .onToggleTap {
                         authViewModel.errorMessage = nil
-                        authViewModel.transition(via: .loading, to: .signup)
+                        authViewModel.transition(via: .transition, to: .signup)
                     }
                     .onForgotPasswordTap {
                         authViewModel.errorMessage = nil
-                        authViewModel.transition(via: .loading, to: .forgotPassword)
+                        authViewModel.transition(via: .transition, to: .forgotPassword)
                     }
             case .signup:
-                SignUpView(errorMessage: $authViewModel.errorMessage)
+                SignUpView(isLoading: $authViewModel.isLoading, errorMessage: $authViewModel.errorMessage)
                     .onSignupTap({ form in
                         Task {
                             await authViewModel.signUp(form: form)
@@ -47,12 +47,15 @@ struct AuthFlowView: View {
                     })
                     .onToggleTap {
                         authViewModel.errorMessage = nil
-                        authViewModel.transition(via: .loading, to: .login)
+                        authViewModel.transition(via: .transition, to: .login)
                     }
             case .confirmEmail (let email):
                 ConfirmEmailView(email: email, errorMessage: $authViewModel.errorMessage)
                     .onResendTap {
                         //TODO: Resend Email
+                        Task {
+                            await authViewModel.resendConfirmation(email: email)
+                        }
                     }
                     .onSignOutTap {
                         Task {
@@ -62,9 +65,9 @@ struct AuthFlowView: View {
             case .forgotPassword:
                 ForgotPasswordView(status: .constant(.awaiting), errorMessage: $authViewModel.errorMessage)
                     .onReturnTap {
-                        authViewModel.transition(via: .loading, to: .login)
+                        authViewModel.transition(via: .transition, to: .login)
                     }
-            case .loading:
+            case .transition:
                 EmptyView()
             }
         }

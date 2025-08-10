@@ -11,12 +11,17 @@ import SwiftUI
 
 struct SignUpView: View {
     @StateObject private var signUpForm: SignUpForm = SignUpForm()
+    @Binding var isLoading: Bool
     @Binding var errorMessage: String?
     
     var onSignupTap: ((SignUpForm) -> Void)?
     var onToggleTap: (() -> Void)?
     
     var body: some View {
+        let isDisabled = Binding<Bool>(
+            get: { !signUpForm.isValid || isLoading },
+            set: { _ in }
+        )
         let isError = Binding<Bool>(
             get: { errorMessage != nil },
             set: { newValue in
@@ -58,6 +63,7 @@ struct SignUpView: View {
                     .onTap {
                         onSignupTap?(signUpForm)
                     }
+                    .disabled(isDisabled)
                 
                 LogInSignUpToggle(toLogin: true) {
                     onToggleTap?()
@@ -75,15 +81,15 @@ struct SignUpView: View {
 
 extension SignUpView {
     func onSignupTap(_ action: @escaping (SignUpForm) -> Void) -> SignUpView {
-        return SignUpView(errorMessage: self.$errorMessage, onSignupTap: action, onToggleTap: self.onToggleTap)
+        return SignUpView(isLoading: self.$isLoading, errorMessage: self.$errorMessage, onSignupTap: action, onToggleTap: self.onToggleTap)
     }
     
     func onToggleTap(_ action: @escaping () -> Void) -> SignUpView {
-        return SignUpView(errorMessage: self.$errorMessage, onSignupTap: self.onSignupTap, onToggleTap: action)
+        return SignUpView(isLoading: self.$isLoading, errorMessage: self.$errorMessage, onSignupTap: self.onSignupTap, onToggleTap: action)
     }
 }
 
 #Preview {
-    SignUpView(errorMessage: .constant("Test"))
+    SignUpView(isLoading: .constant(true), errorMessage: .constant("Test"))
         .appBackground()
 }
