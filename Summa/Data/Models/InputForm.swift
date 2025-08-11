@@ -77,7 +77,7 @@ class SignUpForm: Validatable, ObservableObject {
     }
 }
 
-class ResetPasswordForm: Validatable, ObservableObject {
+class ForgotPasswordForm: Validatable, ObservableObject {
     @Published var email: String
     
     init(email: String = "") {
@@ -87,5 +87,30 @@ class ResetPasswordForm: Validatable, ObservableObject {
     var isValid: Bool {
         let regex = #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
         return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: email)
+    }
+}
+
+class ResetPasswordForm: Validatable, ObservableObject {
+    @Published var password: String
+    @Published var repeatPassword: String
+    
+    init(password: String = "", repeatPassword: String = "") {
+        self.password = password
+        self.repeatPassword = repeatPassword
+    }
+    
+    var isValid: Bool {
+        return isPasswordValid && password == repeatPassword
+    }
+    
+    var isPasswordValid: Bool {
+        let minLength = 8
+        let lowerCase = ".*[a-z]+.*"
+        let upperCase = ".*[A-Z]+.*"
+        let digit = ".*[0-9]+.*"
+        return password.count >= minLength &&
+            NSPredicate(format: "SELF MATCHES %@", lowerCase).evaluate(with: password) &&
+            NSPredicate(format: "SELF MATCHES %@", upperCase).evaluate(with: password) &&
+            NSPredicate(format: "SELF MATCHES %@", digit).evaluate(with: password)
     }
 }

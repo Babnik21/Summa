@@ -34,11 +34,12 @@ struct SignUpView: View {
         VStack {
             Text("Sign up")
                 .font(.title)
-                .padding(.top, 100)
+                .padding(.top, 120)
             
             Spacer()
             
-            VStack(spacing: 10) {
+            VStack(spacing: 8) {
+//            ScrollView {
                 AuthInputFieldView(text: $signUpForm.firstName, title: "First Name", placeholder: "John", isError: isError)
                 
                 AuthInputFieldView(text: $signUpForm.lastName, title: "Last Name", placeholder: "Doe", isError: isError)
@@ -68,7 +69,7 @@ struct SignUpView: View {
                 LogInSignUpToggle(toLogin: true) {
                     onToggleTap?()
                 }
-                .padding(.bottom, 60)
+                .padding(.bottom, 40)
             }
                 .padding(20)
                 .frame(maxHeight: UIScreen.main.bounds.height * 0.75)

@@ -27,7 +27,7 @@ struct ConfirmEmailView: View {
         VStack {
             Text("Confirm Email")
                 .font(.title)
-                .padding(.top, 100)
+                .padding(.top, 120)
             
             Spacer()
             
@@ -55,7 +55,7 @@ struct ConfirmEmailView: View {
                     .padding(.bottom, 60)
             }
                 .padding(20)
-                .frame(maxHeight: UIScreen.main.bounds.height / 2)
+                .frame(maxHeight: UIScreen.main.bounds.height * 0.5)
                 .background(.white)
                 .clipShape(RoundedRectangle(cornerSize: CGSize(width: 25, height: 25)))
         }

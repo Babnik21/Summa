@@ -83,7 +83,7 @@ struct AuthButton: View {
                     .padding(.horizontal, 16)
                 }
                 .opacity(isDisabled ? 0.5 : 1)
-                .frame(maxWidth: .infinity, maxHeight: 60, alignment: .center)
+                .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 60, alignment: .center)
         }
             .disabled(isDisabled)
     }

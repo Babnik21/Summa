@@ -7,6 +7,15 @@
 
 import SwiftUI
 
+enum InputField {
+    case none
+    case email
+    case password
+    case repeatPassword
+    case firstName
+    case lastName
+}
+
 struct LogInView: View {
     @StateObject private var logInForm: LogInForm = LogInForm()
     @Binding var isLoading: Bool
@@ -35,11 +44,11 @@ struct LogInView: View {
         VStack {
             Text("Log in")
                 .font(.title)
-                .padding(.top, 100)
+                .padding(.top, 120)
             
             Spacer()
             
-            VStack(spacing: 10) {
+            VStack(spacing: 8) {
                 AuthInputFieldView(text: $logInForm.email, title: "Email", placeholder: "example@email.com", isError: isError)
                 
                 AuthInputFieldView(text: $logInForm.password, title: "Password", placeholder: "Your Password", isSecureField: true, isError: isError)
@@ -88,10 +97,10 @@ struct LogInView: View {
                     onToggleTap?()
                     return
                 }
-                .padding(.bottom, 60)
+                .padding(.bottom, 40)
             }
                 .padding(20)
-                .frame(maxHeight: UIScreen.main.bounds.height / 1.5)
+                .frame(maxHeight: UIScreen.main.bounds.height * 0.6)
                 .background(.white)
                 .clipShape(RoundedRectangle(cornerSize: CGSize(width: 25, height: 25)))
             

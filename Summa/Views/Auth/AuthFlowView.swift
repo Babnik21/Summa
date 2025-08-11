@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-// TODO: Disable buttons when loading
+// TODO: Set up status for Forgot and Reset Password
 
 struct AuthFlowView: View {
 //    @State private var currentScreen: AuthScreen = .login
@@ -52,21 +52,36 @@ struct AuthFlowView: View {
             case .confirmEmail (let email):
                 ConfirmEmailView(email: email, errorMessage: $authViewModel.errorMessage)
                     .onResendTap {
-                        //TODO: Resend Email
                         Task {
-                            await authViewModel.resendConfirmation(email: email)
+                            await authViewModel.sendConfirmation(email: email, onSuccess: {
+                                authViewModel.authRequestStatus = .success
+                            }, onError: { error in
+                                authViewModel.authRequestStatus = .error(error)
+                            })
                         }
                     }
                     .onSignOutTap {
                         Task {
                             await authViewModel.logOut()
                         }
+                        authViewModel.authRequestStatus = .awaiting
                     }
             case .forgotPassword:
-                ForgotPasswordView(status: .constant(.awaiting), errorMessage: $authViewModel.errorMessage)
+                ForgotPasswordView(status: $authViewModel.authRequestStatus, isLoading: $authViewModel.isLoading, errorMessage: $authViewModel.errorMessage)
+                    .onConfirmTap{ form in
+                        Task {
+                            await authViewModel.sendPasswordReset(email: form.email, onSuccess: {
+                                authViewModel.authRequestStatus = .success
+                            }, onError: { error in
+                                authViewModel.authRequestStatus = .error(error)
+                            })
+                        }
+                    }
                     .onReturnTap {
                         authViewModel.transition(via: .transition, to: .login)
+                        authViewModel.authRequestStatus = .awaiting
                     }
+//            case .resetPassword:
             case .transition:
                 EmptyView()
             }

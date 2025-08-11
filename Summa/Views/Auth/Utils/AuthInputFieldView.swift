@@ -15,6 +15,8 @@ struct AuthInputFieldView: View {
     
     @FocusState var isFocused: Bool
     @Binding var isError: Bool
+//    @FocusState.Binding var externalFocus: InputField?
+//    var equals: InputField = .none
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -29,6 +31,7 @@ struct AuthInputFieldView: View {
                 }
             }
                 .focused($isFocused)
+//                .focused($externalFocus, equals: equals)
                 .padding(12)
                 .background(
                     RoundedRectangle(cornerSize: CGSize(width: 16, height: 16))
@@ -47,7 +50,25 @@ struct AuthInputFieldView: View {
     }
 }
 
+extension AuthInputFieldView {
+//    func focused(_ focusedField: FocusState<InputField?>.Binding, equals: InputField) -> AuthInputFieldView {
+//        return AuthInputFieldView(text: self.$text, title: self.title, placeholder: self.placeholder, isError: self.$isError, externalFocus: focusedField, equals: equals)
+//    }
+    
+//    func focused(equals: InputField) -> AuthInputFieldView {
+//        return AuthInputFieldView(text: self.$text, title: self.title, placeholder: self.placeholder, isError: self.$isError, externalFocus: self.$externalFocus, equals: equals)
+//    }
+}
+
 #Preview {
     AuthInputFieldView(text: .constant(""), title: "Name", placeholder: "Name", isError: .constant(true))
         .appBackground()
 }
+
+
+
+//#Preview {
+//    @FocusState var dummy: InputField?
+//    AuthInputFieldView(text: .constant(""), title: "Name", placeholder: "Name", isError: .constant(true), externalFocus: $dummy, equals: .none)
+//        .appBackground()
+//}
