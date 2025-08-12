@@ -9,15 +9,13 @@ import SwiftUI
 
 struct ForgotPasswordView: View {
     @StateObject var form: ForgotPasswordForm = ForgotPasswordForm()
-    @Binding var status: AuthRequestStatus
-    @Binding var isLoading: Bool
-    @Binding var errorMessage: String?
+    @ObservedObject var authViewModel: AuthViewModel
     
     var onConfirmTap: ((ForgotPasswordForm) -> Void)?
     var onReturnTap: (() -> Void)?
     
     func messageText() -> String {
-        switch status {
+        switch authViewModel.authRequestStatus {
         case .awaiting:
             return "Reset instructions will be sent to your email."
         case .success:
@@ -27,16 +25,18 @@ struct ForgotPasswordView: View {
         }
     }
     
+    @FocusState var focusedField: InputField?
+    
     var body: some View {
         let isDisabled = Binding<Bool>(
-            get: { !form.isValid || isLoading || status != .awaiting },
+            get: { !form.isValid || authViewModel.isLoading || authViewModel.authRequestStatus == .success },
             set: { _ in }
         )
         let isError = Binding<Bool>(
-            get: { errorMessage != nil },
+            get: { authViewModel.errorMessage != nil },
             set: { newValue in
                 if !newValue {
-                    errorMessage = nil
+                    authViewModel.errorMessage = nil
                 }
             }
         )
@@ -49,11 +49,16 @@ struct ForgotPasswordView: View {
             Spacer()
             
             VStack(alignment: .leading, spacing: 10) {
-                AuthInputFieldView(text: $form.email, title: "Enter your email:", placeholder: "example@email.com", isError: isError)
+                AuthInputFieldView(text: $form.email, title: "Enter your email:", placeholder: "example@email.com", isError: isError, focusedField: $focusedField, equals: .email)
+                    .textContentType(.emailAddress)
+                    .submitLabel(.send)
+                    .onSubmit {
+                        onConfirmTap?(form)
+                    }
                 
-                Text(messageText())
+                Text(authViewModel.isLoading ? "Please wait..." : messageText())
                     .font(.subheadline)
-                    .foregroundStyle(status == .error(nil) ? .defaultRed : .primary)
+                    .foregroundStyle(authViewModel.authRequestStatus == .error(nil) ? .defaultRed : .primary)
                     .lineLimit(1)
                 
                 Spacer()
@@ -68,13 +73,16 @@ struct ForgotPasswordView: View {
                     .onTap {
                         onReturnTap?()
                     }
-                    .disabled(isLoading)
+                    .disabled($authViewModel.isLoading)
                     .padding(.bottom, 60)
             }
                 .padding(20)
                 .frame(maxHeight: UIScreen.main.bounds.height * 0.5)
                 .background(.white)
                 .clipShape(RoundedRectangle(cornerSize: CGSize(width: 25, height: 25)))
+                .onTapGesture {
+                    focusedField = nil
+                }
         }
         
     }
@@ -82,15 +90,15 @@ struct ForgotPasswordView: View {
 
 extension ForgotPasswordView {
     func onConfirmTap(_ action: @escaping (ForgotPasswordForm) -> Void) -> ForgotPasswordView {
-        return ForgotPasswordView(form: self.form, status: self.$status, isLoading: self.$isLoading, errorMessage: self.$errorMessage, onConfirmTap: action, onReturnTap: self.onReturnTap)
+        return ForgotPasswordView(form: self.form, authViewModel: self.authViewModel, onConfirmTap: action, onReturnTap: self.onReturnTap)
     }
     
     func onReturnTap(_ action: @escaping () -> Void) -> ForgotPasswordView {
-        return ForgotPasswordView(form: self.form, status: self.$status, isLoading: self.$isLoading, errorMessage: self.$errorMessage, onConfirmTap: self.onConfirmTap, onReturnTap: action)
+        return ForgotPasswordView(form: self.form, authViewModel: self.authViewModel, onConfirmTap: self.onConfirmTap, onReturnTap: action)
     }
 }
 
 #Preview {
-    ForgotPasswordView(status: .constant(.awaiting), isLoading: .constant(true), errorMessage: .constant("Test"))
+    ForgotPasswordView(authViewModel: AuthViewModel())
         .appBackground()
 }

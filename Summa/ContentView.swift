@@ -10,7 +10,7 @@ import SwiftUI
 enum AppState {
     case initializing
     case mainTab
-//    case passwordReset
+    case passwordReset
     case auth
 }
 
@@ -26,7 +26,7 @@ struct ContentView: View {
             switch appState {
             case .mainTab:
                 if authViewModel.isResettingPassword {
-                    ResetPasswordView(isLoading: $authViewModel.isLoading, errorMessage: $authViewModel.errorMessage)
+                    ResetPasswordView(authViewModel: authViewModel)
                         .onConfirmTap { form in
                             Task {
                                 await authViewModel.updatePassword(newPassword: form.password, onSuccess: {
@@ -60,6 +60,8 @@ struct ContentView: View {
             case .auth:
                 AuthFlowView(authViewModel: authViewModel)
                     .transition(.move(edge: .bottom))
+            case .passwordReset:
+                Text("Test")
             case .initializing:
                 SplashScreen(loadingState: $authViewModel.loadingState, loginStatus: $authViewModel.loginStatus)
                     .onComplete {
@@ -86,11 +88,11 @@ struct ContentView: View {
                 }
             }
         
-        Text("appState: \(appState)")
-        
-        Text("loginStatus: \(authViewModel.loginStatus)")
-        
-        Text("authScreen: \(authViewModel.authScreen)")
+//        Text("appState: \(appState)")
+//        
+//        Text("loginStatus: \(authViewModel.loginStatus)")
+//        
+//        Text("authScreen: \(authViewModel.authScreen)")
     }
 }
 

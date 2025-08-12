@@ -10,14 +10,13 @@ import SwiftUI
 // TODO: Set up status for Forgot and Reset Password
 
 struct AuthFlowView: View {
-//    @State private var currentScreen: AuthScreen = .login
     @ObservedObject var authViewModel: AuthViewModel
     
     var body: some View {
         Group {
             switch authViewModel.authScreen {
             case .login:
-                LogInView(isLoading: $authViewModel.isLoading, errorMessage: $authViewModel.errorMessage)
+                LogInView(authViewModel: authViewModel)
                     .onLoginTap({ form in
                         Task {
                             await authViewModel.logIn(form: form)
@@ -39,7 +38,7 @@ struct AuthFlowView: View {
                         authViewModel.transition(via: .transition, to: .forgotPassword)
                     }
             case .signup:
-                SignUpView(isLoading: $authViewModel.isLoading, errorMessage: $authViewModel.errorMessage)
+                SignUpView(authViewModel: authViewModel)
                     .onSignupTap({ form in
                         Task {
                             await authViewModel.signUp(form: form)
@@ -50,7 +49,7 @@ struct AuthFlowView: View {
                         authViewModel.transition(via: .transition, to: .login)
                     }
             case .confirmEmail (let email):
-                ConfirmEmailView(email: email, errorMessage: $authViewModel.errorMessage)
+                ConfirmEmailView(email: email, authViewModel: authViewModel)
                     .onResendTap {
                         Task {
                             await authViewModel.sendConfirmation(email: email, onSuccess: {
@@ -67,7 +66,7 @@ struct AuthFlowView: View {
                         authViewModel.authRequestStatus = .awaiting
                     }
             case .forgotPassword:
-                ForgotPasswordView(status: $authViewModel.authRequestStatus, isLoading: $authViewModel.isLoading, errorMessage: $authViewModel.errorMessage)
+                ForgotPasswordView(authViewModel: authViewModel)
                     .onConfirmTap{ form in
                         Task {
                             await authViewModel.sendPasswordReset(email: form.email, onSuccess: {
@@ -81,7 +80,6 @@ struct AuthFlowView: View {
                         authViewModel.transition(via: .transition, to: .login)
                         authViewModel.authRequestStatus = .awaiting
                     }
-//            case .resetPassword:
             case .transition:
                 EmptyView()
             }

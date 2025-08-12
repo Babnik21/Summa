@@ -83,20 +83,6 @@ class AuthViewModel: ObservableObject {
                 authScreen = .confirmEmail(session.user.email ?? "No Email")
             }
         })
-//        do {
-//            let session = try await auth.session
-//            if session.user.confirmedAt != nil {
-//                loginStatus = .loggedIn
-//            } else {
-//                print("session is not nil but email is not confirmed.")
-//                loginStatus = .loggedOut
-//                authScreen = .confirmEmail(session.user.email ?? "No Email")
-//            }
-//        } catch let error as AuthError {
-//            handleAuthError(error)
-//        } catch {
-//            handleError(error)
-//        }
     }
     
     func logIn(form: LogInForm, onSuccess: (() -> Void)? = nil, onError: ((Error) -> Void)? = nil) async {
@@ -104,21 +90,6 @@ class AuthViewModel: ObservableObject {
             try await auth.signIn(email: form.email, password: form.password)
             print("Signed in")
         }, onSuccess: onSuccess, onError: onError)
-//        do {
-//            defer {
-//                isLoading = false
-//            }
-//            isLoading = true
-//            try await auth.signIn(email: form.email, password: form.password)
-//            onSuccess?()
-//            print("Signed in")
-//        } catch let error as AuthError {
-//            handleAuthError(error, email: form.email)
-//            onError?()
-//        } catch {
-//            handleError(error)
-//            onError?()
-//        }
     }
     
     func signUp(form: SignUpForm, onSuccess: (() -> Void)? = nil, onError: ((Error) -> Void)? = nil) async {
@@ -130,25 +101,6 @@ class AuthViewModel: ObservableObject {
             print("Signed up")
             authScreen = .confirmEmail(form.email.lowercased())
         }, onSuccess: onSuccess, onError: onError)
-//        do {
-//            defer {
-//                isLoading = false
-//            }
-//            isLoading = true
-//            try await auth.signUp(email: form.email, password: form.password, data: [
-//                "first_name": .string(form.firstName),
-//                "last_name": .string(form.lastName)
-//            ], redirectTo: URL(string: "summa://confirm-email"))
-//            print("Signed up")
-//            authScreen = .confirmEmail(form.email.lowercased())
-//            onSuccess?()
-//        } catch let error as AuthError {
-//            handleAuthError(error)
-//            onError?()
-//        } catch {
-//            handleError(error)
-//            onError?()
-//        }
     }
     
     func logOut(onSuccess: (() -> Void)? = nil, onError: ((Error) -> Void)? = nil) async {
@@ -156,21 +108,6 @@ class AuthViewModel: ObservableObject {
             try await auth.signOut()
             loginStatus = .loggedOut
         }, onSuccess: onSuccess, onError: onError)
-//        do {
-//            defer {
-//                isLoading = false
-//            }
-//            isLoading = true
-//            try await auth.signOut()
-//            loginStatus = .loggedOut
-//            onSuccess?()
-//        } catch let error as AuthError {
-//            handleAuthError(error)
-//            onError?()
-//        } catch {
-//            handleError(error)
-//            onError?()
-//        }
     }
     
     func sendConfirmation(email: String, onSuccess: (() -> Void)? = nil, onError: ((Error) -> Void)? = nil) async {
@@ -182,24 +119,6 @@ class AuthViewModel: ObservableObject {
             )
             authRequestStatus = .success
         }, onSuccess: onSuccess, onError: onError)
-//        do {
-//            defer {
-//                isLoading = false
-//            }
-//            isLoading = true
-//            try await auth.resend(
-//                email: email,
-//                type: .signup,
-//                emailRedirectTo: URL(string: "summa://confirm-email")
-//            )
-//            onSuccess?()
-//        } catch let error as AuthError {
-//            handleAuthError(error)
-//            onError?()
-//        } catch {
-//            handleError(error)
-//            onError?()
-//        }
     }
     
     func sendPasswordReset(email: String, onSuccess: (() -> Void)? = nil, onError: ((Error) -> Void)? = nil) async {
@@ -210,24 +129,6 @@ class AuthViewModel: ObservableObject {
             )
             print("Password reset email sent.")
         }, onSuccess: onSuccess, onError: onError)
-//        do {
-//            defer {
-//                isLoading = false
-//            }
-//            isLoading = true
-//            try await auth.resetPasswordForEmail(
-//                email,
-//                redirectTo: URL(string: "summa://reset-password")
-//            )
-//            print("Password reset email sent.")
-//            onSuccess?()
-//        } catch let error as AuthError {
-//            handleAuthError(error)
-//            onError?()
-//        } catch {
-//            handleError(error)
-//            onError?()
-//        }
     }
     
     func updatePassword(newPassword: String, onSuccess: (() -> Void)? = nil, onError: ((Error) -> Void)? = nil) async {
@@ -236,18 +137,6 @@ class AuthViewModel: ObservableObject {
             print("Password updated successfully.")
             isResettingPassword = false
         }, onSuccess: onSuccess, onError: onError)
-//        do {
-//            try await auth.update(user: UserAttributes(password: newPassword))
-//            print("Password updated successfully.")
-//            isResettingPassword = false
-//            onSuccess?()
-//        } catch let error as AuthError {
-//            handleAuthError(error)
-//            onError?()
-//        } catch {
-//            handleError(error)
-//            onError?()
-//        }
     }
     
     func handleUrl(url: URL, onSuccess: (() -> Void)? = nil, onError: ((Error) -> Void)? = nil) async {
@@ -255,21 +144,6 @@ class AuthViewModel: ObservableObject {
             try await auth.session(from: url)
             print("Confirmed email and logged in from email url")
         }, onSuccess: onSuccess, onError: onError)
-//        do {
-//            defer {
-//                isLoading = false
-//            }
-//            isLoading = true
-//            try await auth.session(from: url)
-//            print("Confirmed email and logged in from email url")
-//            onSuccess?()
-//        } catch let error as AuthError {
-//            handleAuthError(error)
-//            onError?()
-//        } catch {
-//            handleError(error)
-//            onError?()
-//        }
     }
 }
 
@@ -304,17 +178,20 @@ extension AuthViewModel {
             case .invalidCredentials:
                 errorMessage = "Invalid email or password"
             case .samePassword:
-                errorMessage = "New password must be different from current password"
+                errorMessage = "New password must not match old one"
             case .weakPassword:
                 errorMessage = "Please chooes a stronger password"
             case .emailNotConfirmed:
                 authScreen = .confirmEmail(email?.lowercased() ?? "")
             case .sessionNotFound, .sessionExpired:
                 authScreen = .login
+            case .validationFailed:
+                errorMessage = "Please enter valid credentials"
             default:
                 errorMessage = error.localizedDescription
                 print(errorMessage ?? "")
                 print(message)
+                print(code)
             }
         default:
             errorMessage = error.localizedDescription
@@ -324,6 +201,7 @@ extension AuthViewModel {
     }
     
     private func handleError(_ error: Error) {
+        print("Unknown error occurred")
         errorMessage = error.localizedDescription
         print(errorMessage ?? "")
         print(error)

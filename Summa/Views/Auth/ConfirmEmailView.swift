@@ -9,21 +9,16 @@ import SwiftUI
 
 struct ConfirmEmailView: View {
     var email: String
-    @Binding var errorMessage: String?
+    @ObservedObject var authViewModel: AuthViewModel
     
     var onResendTap: (() -> Void)?
     var onSignOutTap: (() -> Void)?
     
     var body: some View {
-//        let isError = Binding<Bool>(
-//            get: { errorMessage != nil },
-//            set: { newValue in
-//                if !newValue {
-//                    errorMessage = nil
-//                }
-//            }
-//        )
-        
+        let isDisabled = Binding<Bool>(
+            get: { authViewModel.isLoading || authViewModel.authRequestStatus == .success },
+            set: { _ in }
+        )
         VStack {
             Text("Confirm Email")
                 .font(.title)
@@ -34,7 +29,7 @@ struct ConfirmEmailView: View {
             VStack(alignment: .leading, spacing: 10) {
                 Text("An email with confirmation instructions was sent to \(email).")
                 
-                Text(errorMessage ?? "")
+                Text(authViewModel.isLoading ? "Please wait..." : authViewModel.errorMessage ?? "")
                     .font(.subheadline)
                     .foregroundStyle(.defaultRed)
                     .lineLimit(1)
@@ -44,14 +39,14 @@ struct ConfirmEmailView: View {
                 AuthButton(.custom("Resend email"))
                     .onTap {
                         onResendTap?()
-                        // TODO: Login
                     }
+                    .disabled(isDisabled)
                 
                 AuthButton(.custom("Sign Out"))
                     .onTap {
                         onSignOutTap?()
-                        // TODO: Login
                     }
+                    .disabled($authViewModel.isLoading)
                     .padding(.bottom, 60)
             }
                 .padding(20)
@@ -65,15 +60,15 @@ struct ConfirmEmailView: View {
 
 extension ConfirmEmailView {
     func onResendTap(_ action: @escaping () -> Void) -> ConfirmEmailView {
-        return ConfirmEmailView(email: self.email, errorMessage: self.$errorMessage, onResendTap: action, onSignOutTap: self.onSignOutTap)
+        return ConfirmEmailView(email: self.email, authViewModel: self.authViewModel, onResendTap: action, onSignOutTap: self.onSignOutTap)
     }
     
     func onSignOutTap(_ action: @escaping () -> Void) -> ConfirmEmailView {
-        return ConfirmEmailView(email: self.email, errorMessage: self.$errorMessage, onResendTap: self.onResendTap, onSignOutTap: action)
+        return ConfirmEmailView(email: self.email, authViewModel: self.authViewModel, onResendTap: self.onResendTap, onSignOutTap: action)
     }
 }
 
 #Preview {
-    ConfirmEmailView(email: "Test@email.com", errorMessage: .constant("Test"))
+    ConfirmEmailView(email: "Test@email.com", authViewModel: AuthViewModel())
         .appBackground()
 }

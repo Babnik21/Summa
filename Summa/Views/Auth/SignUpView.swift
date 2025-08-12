@@ -11,22 +11,23 @@ import SwiftUI
 
 struct SignUpView: View {
     @StateObject private var signUpForm: SignUpForm = SignUpForm()
-    @Binding var isLoading: Bool
-    @Binding var errorMessage: String?
+    @ObservedObject var authViewModel: AuthViewModel
     
     var onSignupTap: ((SignUpForm) -> Void)?
     var onToggleTap: (() -> Void)?
     
+    @FocusState var focusedField: InputField?
+    
     var body: some View {
         let isDisabled = Binding<Bool>(
-            get: { !signUpForm.isValid || isLoading },
+            get: { !signUpForm.isValid || authViewModel.isLoading },
             set: { _ in }
         )
         let isError = Binding<Bool>(
-            get: { errorMessage != nil },
+            get: { authViewModel.errorMessage != nil },
             set: { newValue in
                 if !newValue {
-                    errorMessage = nil
+                    authViewModel.errorMessage = nil
                 }
             }
         )
@@ -40,18 +41,39 @@ struct SignUpView: View {
             
             VStack(spacing: 8) {
 //            ScrollView {
-                AuthInputFieldView(text: $signUpForm.firstName, title: "First Name", placeholder: "John", isError: isError)
+                AuthInputFieldView(text: $signUpForm.firstName, title: "First Name", placeholder: "John", isError: isError, focusedField: $focusedField, equals: .firstName)
+                    .textContentType(.givenName)
+                    .onSubmit {
+                        focusedField = .lastName
+                    }
                 
-                AuthInputFieldView(text: $signUpForm.lastName, title: "Last Name", placeholder: "Doe", isError: isError)
+                AuthInputFieldView(text: $signUpForm.lastName, title: "Last Name", placeholder: "Doe", isError: isError, focusedField: $focusedField, equals: .lastName)
+                    .textContentType(.familyName)
+                    .onSubmit {
+                        focusedField = .email
+                    }
                 
-                AuthInputFieldView(text: $signUpForm.email, title: "Email", placeholder: "example@email.com", isError: isError)
+                AuthInputFieldView(text: $signUpForm.email, title: "Email", placeholder: "example@email.com", isError: isError, focusedField: $focusedField, equals: .email)
+                    .textContentType(.emailAddress)
+                    .onSubmit {
+                        focusedField = .password
+                    }
                 
-                AuthInputFieldView(text: $signUpForm.password, title: "Password", placeholder: "Your Password", isSecureField: true, isError: isError)
+                AuthInputFieldView(text: $signUpForm.password, title: "Password", placeholder: "Your Password", isSecureField: true, isError: isError, focusedField: $focusedField, equals: .password)
+                    .textContentType(.newPassword)
+                    .onSubmit {
+                        focusedField = .confirmPassword
+                    }
                 
-                AuthInputFieldView(text: $signUpForm.repeatPassword, title: "Repeat Password", placeholder: "Your Password", isSecureField: true, isError: isError)
+                AuthInputFieldView(text: $signUpForm.repeatPassword, title: "Repeat Password", placeholder: "Your Password", isSecureField: true, isError: isError, focusedField: $focusedField, equals: .confirmPassword)
+                    .textContentType(.newPassword)
+                    .submitLabel(.join)
+                    .onSubmit {
+                        onSignupTap?(signUpForm)
+                    }
                 
                 HStack {
-                    Text(errorMessage ?? "")
+                    Text(authViewModel.errorMessage ?? "")
                         .font(.subheadline)
                         .foregroundStyle(.defaultRed)
                     
@@ -75,6 +97,9 @@ struct SignUpView: View {
                 .frame(maxHeight: UIScreen.main.bounds.height * 0.75)
                 .background(.white)
                 .clipShape(RoundedRectangle(cornerSize: CGSize(width: 25, height: 25)))
+                .onTapGesture {
+                    focusedField = nil
+                }
             
         }
     }
@@ -82,15 +107,15 @@ struct SignUpView: View {
 
 extension SignUpView {
     func onSignupTap(_ action: @escaping (SignUpForm) -> Void) -> SignUpView {
-        return SignUpView(isLoading: self.$isLoading, errorMessage: self.$errorMessage, onSignupTap: action, onToggleTap: self.onToggleTap)
+        return SignUpView(authViewModel: self.authViewModel, onSignupTap: action, onToggleTap: self.onToggleTap)
     }
     
     func onToggleTap(_ action: @escaping () -> Void) -> SignUpView {
-        return SignUpView(isLoading: self.$isLoading, errorMessage: self.$errorMessage, onSignupTap: self.onSignupTap, onToggleTap: action)
+        return SignUpView(authViewModel: self.authViewModel, onSignupTap: self.onSignupTap, onToggleTap: action)
     }
 }
 
 #Preview {
-    SignUpView(isLoading: .constant(true), errorMessage: .constant("Test"))
+    SignUpView(authViewModel: AuthViewModel())
         .appBackground()
 }

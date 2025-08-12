@@ -7,24 +7,27 @@
 
 import SwiftUI
 
+// TODO: Pop a notification after successfully resetting password
+
 struct ResetPasswordView: View {
     @StateObject var form: ResetPasswordForm = ResetPasswordForm()
-    @Binding var isLoading: Bool
-    @Binding var errorMessage: String?
+    @ObservedObject var authViewModel: AuthViewModel
     
     var onConfirmTap: ((ResetPasswordForm) -> Void)?
     var onReturnTap: (() -> Void)?
     
+    @FocusState var focusedField: InputField?
+    
     var body: some View {
         let isDisabled = Binding<Bool>(
-            get: { !form.isValid || isLoading },
+            get: { !form.isValid || authViewModel.isLoading },
             set: { _ in }
         )
         let isError = Binding<Bool>(
-            get: { errorMessage != nil },
+            get: { authViewModel.errorMessage != nil },
             set: { newValue in
                 if !newValue {
-                    errorMessage = nil
+                    authViewModel.errorMessage = nil
                 }
             }
         )
@@ -37,11 +40,20 @@ struct ResetPasswordView: View {
             Spacer()
             
             VStack(alignment: .leading, spacing: 8) {
-                AuthInputFieldView(text: $form.password, title: "New password:", placeholder: "password", isSecureField: true, isError: isError)
+                AuthInputFieldView(text: $form.password, title: "New password:", placeholder: "password", isSecureField: true, isError: isError, focusedField: $focusedField, equals: .password)
+                    .textContentType(.newPassword)
+                    .onSubmit {
+                        focusedField = .confirmPassword
+                    }
                 
-                AuthInputFieldView(text: $form.repeatPassword, title: "Repeat new password:", placeholder: "password", isSecureField: true, isError: isError)
+                AuthInputFieldView(text: $form.repeatPassword, title: "Repeat new password:", placeholder: "password", isSecureField: true, isError: isError, focusedField: $focusedField, equals: .confirmPassword)
+                    .textContentType(.newPassword)
+                    .submitLabel(.continue)
+                    .onSubmit {
+                        onConfirmTap?(form)
+                    }
                 
-                Text(errorMessage ?? "")
+                Text(authViewModel.errorMessage ?? "")
                     .font(.subheadline)
                     .foregroundStyle(.defaultRed)
                     .lineLimit(1)
@@ -58,30 +70,33 @@ struct ResetPasswordView: View {
                     .onTap {
                         onReturnTap?()
                     }
-                    .disabled(isLoading)
+                    .disabled($authViewModel.isLoading)
                     .padding(.bottom, 60)
             }
                 .padding(20)
                 .frame(maxHeight: UIScreen.main.bounds.height * 0.5)
                 .background(.white)
                 .clipShape(RoundedRectangle(cornerSize: CGSize(width: 25, height: 25)))
+                .onTapGesture {
+                    focusedField = nil
+                }
+            
         }
-        
     }
 }
 
 extension ResetPasswordView {
     func onConfirmTap(_ action: @escaping (ResetPasswordForm) -> Void) -> ResetPasswordView {
-        return ResetPasswordView(form: self.form, isLoading: self.$isLoading, errorMessage: self.$errorMessage, onConfirmTap: action, onReturnTap: self.onReturnTap)
+        return ResetPasswordView(form: self.form, authViewModel: self.authViewModel, onConfirmTap: action, onReturnTap: self.onReturnTap)
     }
     
     func onReturnTap(_ action: @escaping () -> Void) -> ResetPasswordView {
-        return ResetPasswordView(form: self.form, isLoading: self.$isLoading, errorMessage: self.$errorMessage, onConfirmTap: self.onConfirmTap, onReturnTap: action)
+        return ResetPasswordView(form: self.form, authViewModel: self.authViewModel, onConfirmTap: self.onConfirmTap, onReturnTap: action)
     }
 }
 
 
 #Preview {
-    ResetPasswordView(isLoading: .constant(true), errorMessage: .constant("Test"))
+    ResetPasswordView(authViewModel: AuthViewModel())
         .appBackground()
 }

@@ -13,10 +13,15 @@ struct AuthInputFieldView: View {
     let placeholder: String?
     var isSecureField: Bool = false
     
-    @FocusState var isFocused: Bool
+//    @FocusState var isFocused: Bool
     @Binding var isError: Bool
-//    @FocusState.Binding var externalFocus: InputField?
-//    var equals: InputField = .none
+    var textContentType: UITextContentType = .name
+    var submitLabel: SubmitLabel = .next
+    
+    @FocusState.Binding var focusedField: InputField?
+    var equals: InputField = .none
+    
+    var onSubmit: (() -> Void)?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -30,18 +35,22 @@ struct AuthInputFieldView: View {
                     TextField(placeholder ?? title, text: $text)
                 }
             }
-                .focused($isFocused)
-//                .focused($externalFocus, equals: equals)
+                .focused($focusedField, equals: equals)
+                .textContentType(textContentType)
+                .keyboardType(textContentType == .emailAddress ? .emailAddress : .default)
+                .autocorrectionDisabled()
+                .submitLabel(submitLabel)
+                .onSubmit {
+                    onSubmit?()
+                }
                 .padding(12)
                 .background(
                     RoundedRectangle(cornerSize: CGSize(width: 16, height: 16))
-                        .strokeBorder(isError ? .defaultRed : (isFocused ? .authButtonStroke : .greenDefault), lineWidth: 1)
+                        .strokeBorder(isError ? .defaultRed : (focusedField == equals ? .authButtonStroke : .greenDefault), lineWidth: 1)
                 )
                 .font(.body)
-                .onChange(of: isFocused) { _, newValue in
-                    if newValue {
-                        isError = false
-                    }
+                .onChange(of: focusedField) { _, _ in
+                    isError = false
                 }
                 .onChange(of: text) {
                     isError = false
@@ -50,20 +59,25 @@ struct AuthInputFieldView: View {
     }
 }
 
+// MARK: modifiers
 extension AuthInputFieldView {
-//    func focused(_ focusedField: FocusState<InputField?>.Binding, equals: InputField) -> AuthInputFieldView {
-//        return AuthInputFieldView(text: self.$text, title: self.title, placeholder: self.placeholder, isError: self.$isError, externalFocus: focusedField, equals: equals)
-//    }
+    func onSubmit(_ perform: @escaping () -> Void) -> AuthInputFieldView {
+        return AuthInputFieldView(text: self.$text, title: self.title, placeholder: self.placeholder, isSecureField: self.isSecureField, isError: self.$isError, textContentType: self.textContentType, submitLabel: self.submitLabel, focusedField: self.$focusedField, equals: self.equals, onSubmit: perform)
+    }
     
-//    func focused(equals: InputField) -> AuthInputFieldView {
-//        return AuthInputFieldView(text: self.$text, title: self.title, placeholder: self.placeholder, isError: self.$isError, externalFocus: self.$externalFocus, equals: equals)
-//    }
+    func textContentType(_ contentType: UITextContentType) -> AuthInputFieldView {
+        return AuthInputFieldView(text: self.$text, title: self.title, placeholder: self.placeholder, isSecureField: self.isSecureField, isError: self.$isError, textContentType: contentType, submitLabel: self.submitLabel, focusedField: self.$focusedField, equals: self.equals, onSubmit: self.onSubmit)
+    }
+    
+    func submitLabel(_ label: SubmitLabel) -> AuthInputFieldView {
+        return AuthInputFieldView(text: self.$text, title: self.title, placeholder: self.placeholder, isSecureField: self.isSecureField, isError: self.$isError, textContentType: self.textContentType, submitLabel: label, focusedField: self.$focusedField, equals: self.equals, onSubmit: self.onSubmit)
+    }
 }
 
-#Preview {
-    AuthInputFieldView(text: .constant(""), title: "Name", placeholder: "Name", isError: .constant(true))
-        .appBackground()
-}
+//#Preview {
+//    AuthInputFieldView(text: .constant(""), title: "Name", placeholder: "Name", isError: .constant(true), focusedField: FocusState<InputField?>.Binding())
+//        .appBackground()
+//}
 
 
 
