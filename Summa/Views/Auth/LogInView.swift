@@ -103,7 +103,6 @@ struct LogInView: View {
                 
                 LogInSignUpToggle(toLogin: false) {
                     onToggleTap?()
-                    return
                 }
                 .padding(.bottom, 40)
             }

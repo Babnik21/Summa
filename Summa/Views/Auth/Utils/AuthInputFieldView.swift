@@ -39,6 +39,7 @@ struct AuthInputFieldView: View {
                 .textContentType(textContentType)
                 .keyboardType(textContentType == .emailAddress ? .emailAddress : .default)
                 .autocorrectionDisabled()
+                .autocapitalization([.givenName, .familyName, .name].contains(textContentType) ? .none : .words)
                 .submitLabel(submitLabel)
                 .onSubmit {
                     onSubmit?()

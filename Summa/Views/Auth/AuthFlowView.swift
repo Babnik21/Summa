@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-// TODO: Set up status for Forgot and Reset Password
-
 struct AuthFlowView: View {
     @ObservedObject var authViewModel: AuthViewModel
     

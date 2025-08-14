@@ -25,43 +25,42 @@ struct ContentView: View {
         VStack {
             switch appState {
             case .mainTab:
-                if authViewModel.isResettingPassword {
-                    ResetPasswordView(authViewModel: authViewModel)
-                        .onConfirmTap { form in
-                            Task {
-                                await authViewModel.updatePassword(newPassword: form.password, onSuccess: {
-                                    authViewModel.isResettingPassword = false
-                                    appState = .mainTab
-                                })
-                            }
-                        }
-                        .onReturnTap {
-                            Task {
-                                await authViewModel.logOut()
-                            }
-                            authViewModel.authRequestStatus = .awaiting
-                        }
-                } else {
-                    Text("Hello, \(authViewModel.auth.currentSession?.user.email ?? "No User")")
-                        .transition(.move(edge: .bottom))
-                    
-                    Button {
-                        Task {
-                            await authViewModel.logOut(onSuccess: {
-                                appState = .auth
-                            })
-                        }
-                    } label: {
-                        Text("Sign Out")
-                            .tint(.primary)
-                    }
+                Text("Hello, \(authViewModel.auth.currentSession?.user.email ?? "No User")")
                     .transition(.move(edge: .bottom))
+                
+                Button {
+                    Task {
+                        await authViewModel.logOut(onSuccess: {
+                            appState = .auth
+                        })
+                    }
+                } label: {
+                    Text("Sign Out")
+                        .tint(.primary)
                 }
+                .transition(.move(edge: .bottom))
             case .auth:
                 AuthFlowView(authViewModel: authViewModel)
                     .transition(.move(edge: .bottom))
             case .passwordReset:
-                Text("Test")
+                ResetPasswordView(authViewModel: authViewModel)
+                    .onConfirmTap { form in
+                        Task {
+                            await authViewModel.updatePassword(newPassword: form.password, onSuccess: {
+                                authViewModel.isResettingPassword = false
+                                appState = .mainTab
+                            })
+                        }
+                    }
+                    .onReturnTap {
+                        Task {
+                            await authViewModel.logOut(onSuccess: {
+                                authViewModel.authRequestStatus = .awaiting
+                                authViewModel.isResettingPassword = false
+                            })
+                        }
+                    }
+                    .transition(.move(edge: .bottom))
             case .initializing:
                 SplashScreen(loadingState: $authViewModel.loadingState, loginStatus: $authViewModel.loginStatus)
                     .onComplete {
@@ -74,25 +73,31 @@ struct ContentView: View {
                 Task {
                     await authViewModel.handleUrl(url: url, onSuccess: {
                         if url.absoluteString.starts(with: "summa://reset-password") {
-                            print("Resetting password")
                             withAnimation {
                                 authViewModel.isResettingPassword = true
+                                appState = .passwordReset
                             }
                         }
                     })
                 }
             }
             .onChange(of: authViewModel.loginStatus) { _, newValue in
-                if appState != .initializing {
-                    appState = newValue == .loggedIn ? .mainTab : .auth
+                updateState(newValue)
+            }
+    }
+}
+
+extension ContentView {
+    func updateState(_ loginStatus: LoginStatus) -> Void {
+        if appState != .initializing {
+            withAnimation {
+                if authViewModel.isResettingPassword {
+                    appState = .passwordReset
+                } else {
+                    appState = loginStatus == .loggedIn ? .mainTab : .auth
                 }
             }
-        
-//        Text("appState: \(appState)")
-//        
-//        Text("loginStatus: \(authViewModel.loginStatus)")
-//        
-//        Text("authScreen: \(authViewModel.authScreen)")
+        }
     }
 }
 

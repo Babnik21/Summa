@@ -55,6 +55,9 @@ struct ForgotPasswordView: View {
                     .onSubmit {
                         onConfirmTap?(form)
                     }
+                    .onChange(of: form.email) { _, _ in
+                        authViewModel.authRequestStatus = .awaiting
+                    }
                 
                 Text(authViewModel.isLoading ? "Please wait..." : messageText())
                     .font(.subheadline)

@@ -175,35 +175,34 @@ extension AuthViewModel {
             switch code {
             case .emailExists:
                 errorMessage = "Email already exists"
-            case .invalidCredentials:
+            case .invalidCredentials, .validationFailed:
                 errorMessage = "Invalid email or password"
             case .samePassword:
-                errorMessage = "New password must not match old one"
+                errorMessage = "Please choose a new password"
             case .weakPassword:
                 errorMessage = "Please chooes a stronger password"
             case .emailNotConfirmed:
                 authScreen = .confirmEmail(email?.lowercased() ?? "")
             case .sessionNotFound, .sessionExpired:
                 authScreen = .login
-            case .validationFailed:
-                errorMessage = "Please enter valid credentials"
+            case .overEmailSendRateLimit:
+                if let num = message.range(of: #"\d+"#, options: .regularExpression) {
+                    errorMessage = "Please wait: \(message[num]) seconds."
+                }
             default:
-                errorMessage = error.localizedDescription
-                print(errorMessage ?? "")
+                errorMessage = "Something went wrong. Try again later."
                 print(message)
                 print(code)
             }
         default:
-            errorMessage = error.localizedDescription
-            print(errorMessage ?? "")
-            print(error)
+            errorMessage = "Something went wrong. Try again later."
+            print(error.localizedDescription)
         }
     }
     
     private func handleError(_ error: Error) {
-        print("Unknown error occurred")
-        errorMessage = error.localizedDescription
-        print(errorMessage ?? "")
+        errorMessage = "Something went wrong. Try again later."
+        print(error.localizedDescription)
         print(error)
     }
 }
